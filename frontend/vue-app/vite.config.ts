@@ -10,6 +10,10 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  root: './', // اطمینان حاصل کنید که این مسیر به دایرکتوری حاوی index.html اشاره می‌کند
+  build: {
+    outDir: 'dist', // دایرکتوری خروجی برای ساخت
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
