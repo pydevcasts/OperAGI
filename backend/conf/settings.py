@@ -25,7 +25,15 @@ SECRET_KEY = 'django-insecure-(xp^lz%agm&8g$0x=tl4p1opwr+5hnme^z%zio(di58t8hgp7i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "operagi.com",
+    "www.operagi.com",
+    "46.249.101.39",
+    "localhost",
+    "127.0.0.1",
+    "[::1]",  # IPv6 localhost
+    "backend",  # If used in Docker
+]
 
 
 # Application definition
@@ -133,7 +141,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -141,7 +149,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+DOMAIN_NAME = 'https://operagi.com'

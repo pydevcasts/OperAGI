@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from api.views import health_check, home
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -19,12 +20,14 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('api/', include('speech.urls')),
     
     # Swagger UI
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     
     # Redoc UI
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('health/', health_check),
+    path('', home, name='home'),  # اضافه کردن صفحه اصلی
     
 ]
