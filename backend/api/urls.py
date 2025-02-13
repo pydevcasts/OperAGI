@@ -5,7 +5,7 @@ app_name = "api"
 
 
 urlpatterns = [
-    path('transcribe/', TranscribeAudioView.as_view(), name='transcribe_audio'),
+    path('', TranscribeAudioView.as_view(), name='transcribe_audio'),
     
 ]
 

@@ -24,7 +24,6 @@ export default {
   },
   methods: {
     async startRecording() {
-      // بررسی وجود navigator.mediaDevices.getUserMedia
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         console.error('getUserMedia is not supported on this browser.');
         alert('Your browser does not support audio recording.');
@@ -65,14 +64,21 @@ export default {
       formData.append('audio', audioBlob, 'recording.wav');
 
       try {
-        const response = await fetch('http://operagi.com:8000/api/transcribe/', {
+        const response = await fetch('https://operagi.com/api/', {  // تغییر به HTTPS
           method: 'POST',
           body: formData
         });
+
+        // بررسی وضعیت پاسخ
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         this.transcription = data.transcription;
       } catch (error) {
         console.error('Error sending audio to server:', error);
+        alert('There was an error sending the audio to the server. Please try again.');
       }
     }
   }
