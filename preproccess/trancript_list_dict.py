@@ -1,32 +1,31 @@
-
 import json
 
-# تابع برای خواندن داده‌ها از فایل و تبدیل به لیست دیکشنری‌ها
+# Function to read data from a file and convert it into a list of dictionaries
 def load_data(file_path):
-    data_list = []
-    with open(file_path, 'r', encoding='utf-8') as file:
-        for line in file:
-            if line.strip():  # بررسی اینکه خط خالی نباشد
-                data_list.append(json.loads(line.strip()))  # تبدیل هر خط به دیکشنری
-    return data_list
+    data_list = []  # Initialize an empty list to store the data
+    with open(file_path, 'r', encoding='utf-8') as file:  # Open the file for reading
+        for line in file:  # Iterate over each line in the file
+            if line.strip():  # Check that the line is not empty
+                data_list.append(json.loads(line.strip()))  # Convert each line to a dictionary and add it to the list
+    return data_list  # Return the list of dictionaries
 
-# تابع برای ذخیره داده‌ها به صورت یک لیست در یک فایل
+# Function to save data as a list into a file
 def save_data(data, output_file_path):
-    with open(output_file_path, 'w', encoding='utf-8') as file:
-        json.dump(data, file, ensure_ascii=False, indent=4)  # ذخیره به فرمت JSON
+    with open(output_file_path, 'w', encoding='utf-8') as file:  # Open the output file for writing
+        json.dump(data, file, ensure_ascii=False, indent=4)  # Save the data in JSON format with indentation for readability
 
-# مسیر فایل متنی
-text_file_path = './transcript_to_dict.txt'  # مسیر فایل متنی خود را اینجا قرار دهید
-output_file_path = './transcript_list.json'  # مسیر فایل خروجی
+# Path to the text file containing the data
+text_file_path = './transcript_to_dict.txt'  # Specify the path to your text file here
+output_file_path = './transcript_list.json'  # Specify the output file path for saving the JSON data
 
-# بارگذاری داده‌ها
-data = load_data(text_file_path)
+# Load data from the text file
+data = load_data(text_file_path)  # Call the load_data function to read the data
 
-# نمایش داده‌ها
-for entry in data:
-    print(entry)
+# Display the loaded data
+for entry in data:  # Iterate over each entry in the loaded data
+    print(entry)  # Print the entry to the console
 
-# ذخیره داده‌ها به صورت یک لیست در فایل
-save_data(data, output_file_path)
+# Save the loaded data as a list in the output file
+save_data(data, output_file_path)  # Call the save_data function to write the data to the JSON file
 
-print(f"Data has been saved to {output_file_path}")
+print(f"Data has been saved to {output_file_path}")  # Print a confirmation message indicating where the data has been saved

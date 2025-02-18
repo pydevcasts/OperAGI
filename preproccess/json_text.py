@@ -1,38 +1,38 @@
 import os
 import json
 
-# تابع برای پردازش هر خط و تولید دیکشنری
+# Function to process each line and generate a dictionary
 def parse_line(line):
-    parts = line.split('"')
-    audio_file = parts[1].strip()  # مسیر فایل صوتی
-    text = parts[3].strip()          # متن مربوط به فایل صوتی
+    parts = line.split('"')  # Split the line by double quotes
+    audio_file = parts[1].strip()  # Extract the audio file path (second part)
+    text = parts[3].strip()          # Extract the corresponding text (fourth part)
     return {
-        'file_path': audio_file,
-        'text': text
+        'file_path': audio_file,  # Create a dictionary with the file path
+        'text': text              # Add the text to the dictionary
     }
 
-# تابع برای خواندن فایل و تولید لیست دیکشنری‌ها
+# Function to read the file and generate a list of dictionaries
 def process_file(file_path):
-    data_list = []
-    with open(file_path, 'r', encoding='utf-8') as file:
-        for line in file:
-            if line.strip():  # بررسی اینکه خط خالی نباشد
-                data_list.append(parse_line(line))
-    return data_list
+    data_list = []  # Initialize an empty list to store the data
+    with open(file_path, 'r', encoding='utf-8') as file:  # Open the specified file for reading
+        for line in file:  # Iterate over each line in the file
+            if line.strip():  # Check that the line is not empty
+                data_list.append(parse_line(line))  # Parse the line and add the resulting dictionary to the list
+    return data_list  # Return the list of dictionaries
 
-# مسیر فایل متنی
-text_file_path = '../audio/Persian_speech/transcript.txt'  # مسیر فایل متنی خود را اینجا قرار دهید
+# Path to the text file containing the data
+text_file_path = '../audio/Persian_speech/transcript.txt'  # Specify the path to your text file here
 
-# پردازش فایل و دریافت لیست دیکشنری‌ها
-data = process_file(text_file_path)
+# Process the file and obtain the list of dictionaries
+data = process_file(text_file_path)  # Call the process_file function to read and parse the data
 
-# نوشتن داده‌ها به فایل
-with open("transcript_fixed.txt", mode="w", encoding='utf-8') as file:
-    for entry in data:
-        # تبدیل دیکشنری به رشته JSON و نوشتن در فایل
-        json.dump(entry, file, ensure_ascii=False)
-        file.write('\n')  # اضافه کردن یک خط جدید برای هر دیکشنری
+# Write the data to a new file
+with open("transcript_fixed.txt", mode="w", encoding='utf-8') as file:  # Open the output file for writing
+    for entry in data:  # Iterate over each entry in the data list
+        # Convert the dictionary to a JSON string and write it to the file
+        json.dump(entry, file, ensure_ascii=False)  # Write the JSON representation of the dictionary
+        file.write('\n')  # Add a newline character for each dictionary to separate entries
 
-# نمایش داده‌ها
-for entry in data:
-    print(entry)
+# Display the data
+for entry in data:  # Iterate over each entry in the data list
+    print(entry)  # Print the entry to the console
