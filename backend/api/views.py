@@ -61,5 +61,79 @@ def health_check(request):
     return HttpResponse("Healthy", status=200)
 
 
-def home(request):
-    return render(request, 'home.html')  # یا هر template دیگری که می‌خواهید
+
+def deepseek(request):
+    return render(request, 'home.html')
+
+#######@#########################
+
+# import requests
+
+# # Replace with your OpenRouter API key
+# API_KEY = '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'
+# API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+
+# # Define the headers for the API request
+# headers = {
+#     'Authorization': f'Bearer {API_KEY}',
+#     'Content-Type': 'application/json'
+# }
+
+# # Define the request payload (data)
+# data = {
+#     "model": "deepseek/deepseek-chat:free",
+#     "messages": [{"role": "user", "content": "What is the meaning of life?"}]
+# }
+
+# # Send the POST request to the DeepSeek API
+# response = requests.post(API_URL, json=data, headers=headers)
+
+# # Check if the request was successful
+# if response.status_code == 200:
+#     print("API Response:", response.json())
+# else:
+#     print("Failed to fetch data from API. Status Code:", response.status_code)
+# views.py
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import requests
+
+def chat_view(request):
+    return render(request, 'home.html')
+
+@csrf_exempt  # Disable CSRF for simplicity; use with caution in production
+def chat_with_deepseek(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message')
+
+            # Replace with your OpenRouter API key
+            API_KEY = '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'
+            API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+
+            # Define the headers for the API request
+            headers = {
+                'Authorization': f'Bearer {API_KEY}',
+                'Content-Type': 'application/json'
+            }
+
+            # Define the request payload (data)
+            payload = {
+                "model": "deepseek/deepseek-chat:free",
+                "messages": [{"role": "user", "content": user_message}]
+            }
+
+            # Send the POST request to the DeepSeek API
+            response = requests.post(API_URL, json=payload, headers=headers)
+
+            if response.status_code == 200:
+                return JsonResponse(response.json())
+            else:
+                return JsonResponse({'error': 'Failed to fetch data from API'}, status=response.status_code)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

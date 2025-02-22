@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek ChatGPT Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #response {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>DeepSeek ChatGPT API Integration</h1>
+    <textarea id="userInput" rows="4" cols="50" placeholder="Ask something..."></textarea><br>
+    <button id="sendButton">Send</button>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('sendButton').addEventListener('click', async () => {
+            const userInput = document.getElementById('userInput').value;
+
+            try {
+                const response = await fetch('/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: userInput })
+                });
+
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    document.getElementById('response').innerText = JSON.stringify(jsonResponse, null, 2);
+                } else {
+                    document.getElementById('response').innerText = 'Failed to fetch data from server. Status Code: ' + response.status;
+                }
+            } catch (error) {
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+
+</html>
