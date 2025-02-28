@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import TranscribeAudioView, chat_with_deepseek 
+from .views import TranscribeAudioView, chat_completion
 
 app_name = "api"
 
 urlpatterns = [
     path('', TranscribeAudioView.as_view(), name='transcribe_audio'),
-    path('chat/', chat_with_deepseek, name='chat_with_deepseek'),
+    path('chat/', chat_completion, name='chat_completion'),
 ]

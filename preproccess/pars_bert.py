@@ -7,10 +7,13 @@ API_KEY = 'AIzaSyCnP_Vsvo6xRGS2SbIbG6eG15NuXuB523Y'  # Replace with your Google 
 CSE_ID = '057e93d3a50154aab'  # Replace with your Custom Search Engine ID
 
 # Load ParsBERT model and tokenizer
-model_name = "HooshvareLab/bert-fa-base-uncased"  # Pre-trained BERT model for Persian
-tokenizer = BertTokenizer.from_pretrained(model_name)  # Load the tokenizer
-model = BertForQuestionAnswering.from_pretrained(model_name)  # Load the QA model
+# model_name = "HooshvareLab/bert-fa-base-uncased"  # Pre-trained BERT model for Persian
+# tokenizer = BertTokenizer.from_pretrained(model_name)  # Load the tokenizer
+# model = BertForQuestionAnswering.from_pretrained(model_name)  # Load the QA model
+from transformers import AutoTokenizer, AutoModelForMaskedLM
 
+tokenizer = AutoTokenizer.from_pretrained("HooshvareLab/bert-base-parsbert-uncased")
+model = AutoModelForMaskedLM.from_pretrained("HooshvareLab/bert-base-parsbert-uncased")
 def google_search(query):
     """
     Perform a Google search using the Custom Search API.
