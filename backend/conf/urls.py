@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from api.views import health_check, deepseek
+# from api.views import health_check, deepseek
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -27,7 +27,7 @@ urlpatterns = [
     
     # Redoc UI
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('health/', health_check),
-    path('', deepseek, name='home'),  # اضافه کردن صفحه اصلی
+    # path('health/', health_check),
+    # path('', deepseek, name='home'),  # اضافه کردن صفحه اصلی
     
 ]

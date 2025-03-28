@@ -54,33 +54,33 @@ export default {
         this.isRecording = false;
       }
     },
-    async handleStopRecording() {
-      const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-      this.audioUrl = URL.createObjectURL(audioBlob);
-      await this.sendAudioToServer(audioBlob);
-    },
-    async sendAudioToServer(audioBlob: Blob) {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
+async handleStopRecording() {
+    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' }); // or 'audio/ogg'
+    this.audioUrl = URL.createObjectURL(audioBlob);
+    await this.sendAudioToServer(audioBlob);
+},
+   async sendAudioToServer(audioBlob: Blob) {
+  const formData = new FormData();
+  formData.append('audio', audioBlob, 'recording.webm'); // تغییر به recording.webm
 
-      try {
-        const response = await fetch('https://operagi.com/api/', {  // تغییر به HTTPS
-          method: 'POST',
-          body: formData
-        });
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/', {
+      method: 'POST',
+      body: formData
+    });
 
-        // بررسی وضعیت پاسخ
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        this.transcription = data.transcription;
-      } catch (error) {
-        console.error('Error sending audio to server:', error);
-        alert('There was an error sending the audio to the server. Please try again.');
-      }
+    if (!response.ok) {
+      const errorText = await response.text(); // دریافت متن خطا
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
+
+    const data = await response.json();
+    this.transcription = data.transcription;
+  } catch (error) {
+    console.error('Error sending audio to server:', error);
+    alert('There was an error sending the audio to the server. Please try again.');
+  }
+}
   }
 };
 </script>

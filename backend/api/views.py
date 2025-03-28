@@ -1,69 +1,65 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import torchaudio
-from torchaudio.transforms import Resample
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 import torch
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import torchaudio
 import logging
-from django.http import HttpResponse
-from django.shortcuts import render,HttpResponse
+from pydub import AudioSegment
+import io
 
 
-
-# Load the HuBERT model and processor
-processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
-model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
+ffmpeg_path = '/usr/bin/ffmpeg'
+AudioSegment.converter = ffmpeg_path
 
 logger = logging.getLogger(__name__)
 
+processor = WhisperProcessor.from_pretrained("openai/whisper-large-v3-turbo")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large-v3-turbo")
+
 class TranscribeAudioView(APIView):
     def post(self, request):
-        if 'audio' not in request.FILES:
+        audio_file = request.FILES.get('audio')
+        logger.debug(f"Received file: {audio_file}, Content-Type: {audio_file}")
+
+        if not audio_file:
             return Response({'error': 'No audio file provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        audio_file = request.FILES['audio']
-        
-        # Validate file type and size
-        if audio_file.content_type not in ['audio/wav', 'audio/mpeg']:
-            return Response({'error': 'Unsupported file type'}, status=status.HTTP_400_BAD_REQUEST)
-        if audio_file.size > 10 * 1024 * 1024:  # 10 MB limit
-            return Response({'error': 'File size exceeds limit'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            waveform, sample_rate = torchaudio.load(audio_file)
+            audio_segment = AudioSegment.from_file(audio_file)
+            audio_segment = audio_segment.set_frame_rate(16000)
         except Exception as e:
-            logger.error(f"Error loading audio file: {e}")
-            return Response({'error': 'Failed to load audio file'}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"Error converting audio file: {e}")
+            return Response({'error': 'Error converting audio file'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Resample if necessary
-        if sample_rate != 16000:
-            logger.warning(f"Input sample rate is {sample_rate}. Converting to 16000 Hz.")
-            resample = Resample(orig_freq=sample_rate, new_freq=16000)
-            waveform = resample(waveform)
+        wav_io = io.BytesIO()
+        audio_segment.export(wav_io, format="wav")
+        wav_io.seek(0)
 
-        # Process input
-        try:
-            inputs = processor(waveform.squeeze().numpy(), sampling_rate=16000, return_tensors="pt", padding=True)
-            with torch.no_grad():
-                logits = model(inputs.input_values).logits
-            predicted_ids = torch.argmax(logits, dim=-1)
-            transcription = processor.batch_decode(predicted_ids)
-        except Exception as e:
-            logger.error(f"Error during transcription: {e}")
-            return Response({'error': 'Transcription failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        waveform, sample_rate = torchaudio.load(wav_io)
+        inputs = processor(waveform.squeeze(), sampling_rate=sample_rate, return_tensors="pt")
+        with torch.no_grad():
+            predicted_ids = model.generate(
+                **inputs,
+                max_length=448,  # حداکثر طول خروجی
+                num_beams=5,     # تعداد پرتوها برای جستجوی بهتر
+                temperature=0.7, # کنترل تنوع
+                top_k=50,        # تنظیم توزیع احتمالی
+                top_p=0.95       # تنظیم توزیع احتمالی
+            )
+        transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+        return Response({'transcription': transcription}, status=status.HTTP_200_OK)
 
-        # Log and return the transcription
-        logger.info(f"Transcription: {transcription[0]}")
-        return Response({'transcription': transcription[0]})
-        pass
+
 def health_check(request):
-    return HttpResponse("Healthy", status=200)
+        pass
+    # return HttpResponse("Healthy", status=200)
 
 
 
 def deepseek(request):
-    return render(request, 'home.html')
+    pass
+    # return render(request, 'home.html')
 
 # # views.py
 # from django.http import JsonResponse
@@ -212,83 +208,83 @@ def deepseek(request):
 
 #################3
 # Import necessary libraries
-import unsloth 
-import os
-import torch
-import wandb
-from unsloth import FastLanguageModel
-from huggingface_hub import login
-from transformers import TrainingArguments
-from datasets import load_dataset
+# import unsloth 
+# import os
+# import torch
+# import wandb
+# from unsloth import FastLanguageModel
+# from huggingface_hub import login
+# from transformers import TrainingArguments
+# from datasets import load_dataset
 
-# Set environment variables for access tokens
-os.environ['HUGGING_FACE_TOKEN'] = 'your_hugging_face_token'
-os.environ['WANDB_TOKEN'] = 'your_wandb_token'
+# # Set environment variables for access tokens
+# os.environ['HUGGING_FACE_TOKEN'] = 'your_hugging_face_token'
+# os.environ['WANDB_TOKEN'] = 'your_wandb_token'
 
-# Log in to Hugging Face and Weights & Biases
-login(os.environ['HUGGING_FACE_TOKEN'])
-wandb.login(key=os.environ['WANDB_TOKEN'])
+# # Log in to Hugging Face and Weights & Biases
+# login(os.environ['HUGGING_FACE_TOKEN'])
+# wandb.login(key=os.environ['WANDB_TOKEN'])
 
-# Check for GPU availability
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using device: {device}")
+# # Check for GPU availability
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+# print(f"Using device: {device}")
 
-# Model settings
-max_seq_length = 2048
-dtype = None  # Consider specifying dtype as torch.float16 if you're using mixed precision
-load_in_4bit = True
+# # Model settings
+# max_seq_length = 2048
+# dtype = None  # Consider specifying dtype as torch.float16 if you're using mixed precision
+# load_in_4bit = True
 
-# Load the model and tokenizer
-try:
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="unsloth/DeepSeek-R1-Distill-Llama-8B",
-        max_seq_length=max_seq_length,
-        dtype=dtype,
-        load_in_4bit=load_in_4bit,
-        token=os.environ['HUGGING_FACE_TOKEN']
-    )
-except Exception as e:
-    print(f"Error loading model: {e}")
-    raise
+# # Load the model and tokenizer
+# try:
+#     model, tokenizer = FastLanguageModel.from_pretrained(
+#         model_name="unsloth/DeepSeek-R1-Distill-Llama-8B",
+#         max_seq_length=max_seq_length,
+#         dtype=dtype,
+#         load_in_4bit=load_in_4bit,
+#         token=os.environ['HUGGING_FACE_TOKEN']
+#     )
+# except Exception as e:
+#     print(f"Error loading model: {e}")
+#     raise
 
-# Start a new run in wandb
-run = wandb.init(project='Fine_tune_DeepSeek_Llama_80 on Medical COT Dataset', job_type="training", anonymous="allow")
+# # Start a new run in wandb
+# run = wandb.init(project='Fine_tune_DeepSeek_Llama_80 on Medical COT Dataset', job_type="training", anonymous="allow")
 
-# Prepare the prompt
-prompt_template = """### Role:
-You are a medical expert specializing in clinical reasoning, diagnostics, and treatment planning. Your responses should:
-- Be evidence-based and clinically relevant
-- Include differential diagnoses when appropriate
-- Consider patient safety and standard of care
-- Note any important limitations or uncertainties
+# # Prepare the prompt
+# prompt_template = """### Role:
+# You are a medical expert specializing in clinical reasoning, diagnostics, and treatment planning. Your responses should:
+# - Be evidence-based and clinically relevant
+# - Include differential diagnoses when appropriate
+# - Consider patient safety and standard of care
+# - Note any important limitations or uncertainties
 
-### Question:
-{}
+# ### Question:
+# {}
 
-### Response:
-<think>{}
-"""
+# ### Response:
+# <think>{}
+# """
 
-# Define the question
-question = "Can you tell me which city is the capital of Iran and what its features are?"
+# # Define the question
+# question = "Can you tell me which city is the capital of Iran and what its features are?"
 
-# Prepare inputs for the model
-FastLanguageModel.for_inference(model)
-inputs = tokenizer([prompt_template.format(question, "")], return_tensors="pt").to(device)  # Use the selected device
+# # Prepare inputs for the model
+# FastLanguageModel.for_inference(model)
+# inputs = tokenizer([prompt_template.format(question, "")], return_tensors="pt").to(device)  # Use the selected device
 
-# Generate response using the model
-try:
-    outputs = model.generate(
-        input_ids=inputs['input_ids'],
-        attention_mask=inputs['attention_mask'],
-        max_new_tokens=1200,
-        use_cache=True,
-    )
+# # Generate response using the model
+# try:
+#     outputs = model.generate(
+#         input_ids=inputs['input_ids'],
+#         attention_mask=inputs['attention_mask'],
+#         max_new_tokens=1200,
+#         use_cache=True,
+#     )
     
-    # Decode and print the response
-    response = tokenizer.batch_decode(outputs, skip_special_tokens=True)  # Skip special tokens
-    final_response = response[0].split("### Response:")[1].strip()  # Stripping any extra whitespace
-    print(final_response)
+#     # Decode and print the response
+#     response = tokenizer.batch_decode(outputs, skip_special_tokens=True)  # Skip special tokens
+#     final_response = response[0].split("### Response:")[1].strip()  # Stripping any extra whitespace
+#     print(final_response)
     
-except Exception as e:
-    print(f"Error during model inference: {e}")
+# except Exception as e:
+#     print(f"Error during model inference: {e}")
