@@ -1,7 +1,6 @@
 # import openai
 # import os
 
-# openai.api_key = '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'
 
 # def get_embedding(question, model="text-embedding-3-small"):
 #     response = openai.Embedding.create(
