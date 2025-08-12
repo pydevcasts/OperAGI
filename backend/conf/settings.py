@@ -46,7 +46,14 @@ INSTALLED_APPS = [
     'api',
     'drf_yasg',
     'corsheaders',
+    'accounts',
+    'documents',
+    'embeddings',
+    'qa',
+ 
+
 ]
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -145,10 +152,16 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
 
 DOMAIN_NAME = os.getenv('DOMAIN_NAME')
+
+
+OPENAI_API_KEY = 'sk-ZgWGOUTNen5ORFVgQ0D5IRkVQwPeeX3ccnRuwvFpl3IcCwen'
+

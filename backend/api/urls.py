@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import TranscribeAudioView, DeepSeekResponseView,health_check
+from .views import TranscribeAudioView, health_check,ChatCompletionView
 
 urlpatterns = [
     path('transcribe/', TranscribeAudioView.as_view(), name='transcribe'),
-    path('chat/', DeepSeekResponseView.as_view(), name='chat'),
+    path('openai/completion/', ChatCompletionView.as_view(), name='openai-completion'),
     path('health/', health_check, name='health_check'),
 ]
