@@ -1,14 +1,15 @@
+from documents.models import DocumentChunk
 import numpy as np
-from embeddings.models import DocumentChunk
+
 
 def cosine_similarity(a, b):
+    """Calculate cosine similarity between two vectors."""
     a = np.array(a)
     b = np.array(b)
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-
-
 def retrieve_relevant_chunks(query_embedding, top_k=3):
+    """Retrieve top_k most relevant chunks based on cosine similarity."""
     all_chunks = DocumentChunk.objects.all()
     scored_chunks = []
 

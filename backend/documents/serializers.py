@@ -4,5 +4,5 @@ from .models import Document
 class UploadedDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ['id', 'title', 'pdf_file', 'uploaded_at']
+        fields = ['title', 'file']
         read_only_fields = ['uploaded_at']

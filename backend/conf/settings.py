@@ -31,7 +31,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,8 +48,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'accounts',
     'documents',
-    'embeddings',
     'qa',
+    'rest_framework_simplejwt'
  
 
 ]
@@ -163,5 +163,33 @@ CORS_ALLOW_ALL_ORIGINS = True
 DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 
-OPENAI_API_KEY = 'sk-ZgWGOUTNen5ORFVgQ0D5IRkVQwPeeX3ccnRuwvFpl3IcCwen'
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#         # یا 'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+#     'DEFAULT_PARSER_CLASSES': [
+#         'rest_framework.parsers.JSONParser',
+#         'rest_framework.parsers.MultiPartParser',
+#         'rest_framework.parsers.FormParser',
+#     ],
+# }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # برای گزینه 2
+        # یا 'rest_framework.permissions.IsAuthenticated' برای گزینه 1
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FormParser',
+    ],
+}
