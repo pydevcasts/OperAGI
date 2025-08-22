@@ -1,65 +1,100 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-import torchaudio
-from torchaudio.transforms import Resample
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+import io
 import torch
 import logging
-from django.http import HttpResponse
-from django.shortcuts import render,HttpResponse
+import torchaudio
+from conf import settings
+from pydub import AudioSegment
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
 
 
-# Load the HuBERT model and processor
-processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
-model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
+ffmpeg_path = '/usr/bin/ffmpeg'
+AudioSegment.converter = ffmpeg_path
 
 logger = logging.getLogger(__name__)
 
+processor = WhisperProcessor.from_pretrained("openai/whisper-large-v3-turbo")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large-v3-turbo")
+
 class TranscribeAudioView(APIView):
     def post(self, request):
-        if 'audio' not in request.FILES:
+        audio_file = request.FILES.get('audio')
+        logger.debug(f"Received file: {audio_file}, Content-Type: {audio_file}")
+
+        if not audio_file:
             return Response({'error': 'No audio file provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        audio_file = request.FILES['audio']
-        
-        # Validate file type and size
-        if audio_file.content_type not in ['audio/wav', 'audio/mpeg']:
-            return Response({'error': 'Unsupported file type'}, status=status.HTTP_400_BAD_REQUEST)
-        if audio_file.size > 10 * 1024 * 1024:  # 10 MB limit
-            return Response({'error': 'File size exceeds limit'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            audio_segment = AudioSegment.from_file(audio_file)
+            audio_segment = audio_segment.set_frame_rate(16000)
+        except Exception as e:
+            logger.error(f"Error converting audio file: {e}")
+            return Response({'error': 'Error converting audio file'}, status=status.HTTP_400_BAD_REQUEST)
+
+        wav_io = io.BytesIO()
+        audio_segment.export(wav_io, format="wav")
+        wav_io.seek(0)
+
+        waveform, sample_rate = torchaudio.load(wav_io)
+        inputs = processor(waveform.squeeze(), sampling_rate=sample_rate, return_tensors="pt")
+        with torch.no_grad():
+            predicted_ids = model.generate(
+                **inputs,
+                max_length=448,  # حداکثر طول خروجی
+                num_beams=5,     # تعداد پرتوها برای جستجوی بهتر
+                temperature=0.7, # کنترل تنوع
+                top_k=50,        # تنظیم توزیع احتمالی
+                top_p=0.95       # تنظیم توزیع احتمالی
+            )
+        transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+        return Response({'transcription': transcription}, status=status.HTTP_200_OK)
+
+
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import openai
+
+# Set OpenAI API key and base URL
+openai.api_key = settings.OPENAI_API_KEY
+openai.api_base = 'https://api.gapgpt.app/v1'
+
+class ChatCompletionView(APIView):
+    def post(self, request):
+        # Accept either 'message' or 'prompt' parameter for flexibility
+        user_message = request.data.get('message') or request.data.get('prompt')
+
+        if not user_message:
+            return Response({'error': 'No message provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            waveform, sample_rate = torchaudio.load(audio_file)
+            # Using the older OpenAI API style (pre-v1.0.0)
+            response = openai.ChatCompletion.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "user", "content": user_message}
+                ]
+            )
+            
+            # Extract the answer from the response
+            answer = response['choices'][0]['message']['content']
+            
+            # Return both 'answer' and 'response' fields for compatibility
+            return Response({'answer': answer, 'response': answer})
+
         except Exception as e:
-            logger.error(f"Error loading audio file: {e}")
-            return Response({'error': 'Failed to load audio file'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Resample if necessary
-        if sample_rate != 16000:
-            logger.warning(f"Input sample rate is {sample_rate}. Converting to 16000 Hz.")
-            resample = Resample(orig_freq=sample_rate, new_freq=16000)
-            waveform = resample(waveform)
-
-        # Process input
-        try:
-            inputs = processor(waveform.squeeze().numpy(), sampling_rate=16000, return_tensors="pt", padding=True)
-            with torch.no_grad():
-                logits = model(inputs.input_values).logits
-            predicted_ids = torch.argmax(logits, dim=-1)
-            transcription = processor.batch_decode(predicted_ids)
-        except Exception as e:
-            logger.error(f"Error during transcription: {e}")
-            return Response({'error': 'Transcription failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # Log and return the transcription
-        logger.info(f"Transcription: {transcription[0]}")
-        return Response({'transcription': transcription[0]})
-        pass
 def health_check(request):
-    return HttpResponse("Healthy", status=200)
-
-
-def home(request):
-    return render(request, 'home.html')  # یا هر template دیگری که می‌خواهید
+    health_status = {
+        "status": "healthy",
+        "models": {
+            "whisper": "loaded" if 'processor' in globals() and 'model' in globals() else "not_loaded"
+        }
+    }
+    return Response(health_status, status=status.HTTP_200_OK)

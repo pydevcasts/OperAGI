@@ -13,12 +13,14 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    environment:
-      - DJANGO_SETTINGS_MODULE=conf.settings
-      - POSTGRES_DB=operagi
-      - POSTGRES_USER=operagi
-      - POSTGRES_PASSWORD=operagi
-      - POSTGRES_HOST=postgres
+    # environment:
+    #   - DJANGO_SETTINGS_MODULE=conf.settings
+    #   - POSTGRES_DB=operagi
+    #   - POSTGRES_USER=operagi
+    #   - POSTGRES_PASSWORD=operagi
+    #   - POSTGRES_HOST=postgres
+    env_file:
+      - .env  # Load environment variables from .env file
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,8 +38,10 @@ services:
       context: ./frontend
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
+    # environment:
+    #   - NODE_ENV=production
+    env_file:
+      - .env  # Load environment variables from .env file
     depends_on:
       backend:
         condition: service_healthy
@@ -52,10 +56,12 @@ services:
   postgres:
     image: postgres:15
     restart: always
-    environment:
-      - POSTGRES_DB=operagi
-      - POSTGRES_USER=operagi
-      - POSTGRES_PASSWORD=operagi
+    # environment:
+    #   - POSTGRES_DB=operagi
+    #   - POSTGRES_USER=operagi
+    #   - POSTGRES_PASSWORD=operagi
+    env_file:
+      - .env  # Load environment variables from .env file
     ports:
       - "5432:5432"
     volumes:

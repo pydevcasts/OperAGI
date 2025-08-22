@@ -177,3 +177,7 @@ upload/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Vuejs,typescript
 .DS_Store
 Thumbs.db
+audio/
+/audio/
+audio/*
+./audio/

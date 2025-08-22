@@ -1,11 +1,8 @@
 from django.urls import path
-from .views import  TranscribeAudioView
-
-app_name = "api"
-
+from .views import TranscribeAudioView, health_check,ChatCompletionView
 
 urlpatterns = [
-    path('', TranscribeAudioView.as_view(), name='transcribe_audio'),
-    
+    path('transcribe/', TranscribeAudioView.as_view(), name='transcribe'),
+    path('openai/completion/', ChatCompletionView.as_view(), name='openai-completion'),
+    path('health/', health_check, name='health_check'),
 ]
-
