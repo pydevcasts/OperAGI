@@ -1,161 +1,200 @@
-# import numpy as np
-# from huggingface_hub import InferenceApi
-# import json
+# # 📄 helper/llm.py — TEST VERSION — NO POST-PROCESSING — RAW OUTPUT
 
-# # Initialize the Hugging Face Inference API
-# client = InferenceApi(repo_id="meta-llama/Meta-Llama-3-8B-Instruct", token="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")
+# import requests
+# import json
+# import logging
+# import time
+
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
 
 # def generate_answer(question, context_chunks):
-#     """Generate an answer based on the question and context chunks."""
-#     # Convert context_chunks to list if it's a NumPy array
-#     context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+#     """
+#     Generate answer using Ollama's qwen3:0.6b — RAW OUTPUT for testing.
+#     NO regex, NO cleaning — return exactly what model returns.
+#     """
+#     start_time = time.time()
+#     logger.info(f"🔄 [START] Generating answer for: {question[:50]}...")
 
-#     # Validate that context_chunk_list is a list
-#     if not isinstance(context_chunk_list, list):
-#         raise ValueError("context_chunk_list must be a list")
+#     # === Step 1: Validate & Format Context ===
+#     context_text = ""
+#     try:
+#         if isinstance(context_chunks, list) and len(context_chunks) > 0:
+#             if isinstance(context_chunks[0], dict) and 'content' in context_chunks[0]:
+#                 context_text = "\n\n".join(chunk['content'] for chunk in context_chunks if chunk.get('content', '').strip())
+#             else:
+#                 context_text = "\n\n".join(str(chunk) for chunk in context_chunks if str(chunk).strip())
+#         logger.info(f"✅ Context length: {len(context_text)} chars | {len(context_chunks)} chunks")
+#     except Exception as e:
+#         logger.error(f"❌ Error formatting context: {e}")
+#         return "خطا: پردازش متن اسناد با مشکل مواجه شد."
 
-#     # Validate that each chunk is a dictionary with 'content' key
-#     for chunk in context_chunk_list:
-#         if not isinstance(chunk, dict) or 'content' not in chunk:
-#             print("Invalid chunk:", chunk)  # For debugging
-#             raise ValueError("Each chunk must be a dictionary with a 'content' key")
+#     # === Step 2: Build Simple Prompt ===
+#     prompt = f"""
+# You are pydevcasts, a helpful assistant.
+# Answer based ONLY on the context below.
+# Be clear and concise.
 
-#     # Create context text by joining the content of each chunk
-#     context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
+# Context:
+# {context_text}
 
-#     # Prepare the prompt for the model
-#     prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}"
+# Question:
+# {question}
 
-#     # Debugging: Print the prompt and context
-#     print("Sending request to the model with the prompt:")
-#     print(prompt)
-#     print("Context text:", context_text)
+# Answer:
+# """
+
+#     # === Step 3: Call Ollama ===
+#     url = "http://localhost:11434/api/generate"
+#     payload = {
+#         "model": "qwen3:0.6b",
+#         "prompt": prompt,
+#         "stream": False,
+#         "options": {
+#             "temperature": 0.7,
+#             "top_p": 0.9,
+#             "num_predict": 256,
+#             "num_ctx": 2048,
+#             "stop": ["Question:", "Context:", "Answer:"],
+#             "repeat_penalty": 1.1
+#         }
+#     }
 
 #     try:
-#         # Call the Hugging Face Inference API with raw_response=True
-#         response = client(prompt, raw_response=True)
+#         logger.info("📡 Sending request to Ollama...")
+#         response = requests.post(url, json=payload, timeout=60)
+#         response.raise_for_status()
+#         result = response.json()
+#         raw_answer = result.get("response", "").strip()
 
-#         # Check the status code
-#         if response.status_code != 200:
-#             print(f"Error: Received status code {response.status_code}")
-#             print("Response content:", response.text)
-#             return "An error occurred while receiving the response from the server."
+#         # === 🚫 NO POST-PROCESSING — RETURN RAW ANSWER ===
+#         duration = time.time() - start_time
+#         logger.info(f"✅ [SUCCESS] Answer generated in {duration:.2f} seconds.")
+#         logger.info(f"📝 RAW ANSWER:\n{raw_answer}\n")
 
-#         # Try to parse the response as text or JSON
-#         content_type = response.headers.get('content-type', '')
-#         if 'application/json' in content_type:
-#             response_json = response.json()
-#             if isinstance(response_json, list) and len(response_json) > 0:
-#                 return response_json[0].get('generated_text', '').strip()
-#             else:
-#                 return "No response found for your question."
-#         elif 'text/plain' in content_type:
-#             # Handle plain text response
-#             return response.text.strip()
-#         else:
-#             print(f"Unsupported content type: {content_type}")
-#             return "Unsupported response format from the server."
+#         # فقط اگر خالی بود — fallback
+#         if not raw_answer:
+#             return "پاسخی از مدل دریافت نشد."
+
+#         return raw_answer  # ✅ بدون هیچ تغییری — خام برمی‌گرده
+
+#     except requests.exceptions.Timeout:
+#         logger.error("❌ Ollama request timed out.")
+#         return "خطا: زمان پاسخ مدل به پایان رسید."
 
 #     except Exception as e:
-#         print("An error occurred:", e)
-#         return "An error occurred while processing the response."
-
+#         logger.error(f"❌ Unexpected error: {str(e)}")
+#         return f"خطا در ارتباط با مدل: {str(e)}"
 
 # ================================
-# import numpy as np
-# from huggingface_hub import InferenceClient
+# 📄 helper/llm.py — Ollama Integration with qwen3:0.6b for RAG
 
-# # Initialize the Hugging Face Inference Client
-# client = InferenceClient(
-#     model="distilgpt2",
-#     token="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"  # توکن API خود را وارد کنید
-# )
-# def generate_answer(question, context_chunks):
-#     """Generate an answer based on the question and context chunks."""
-#     context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+import requests
+import json
+import logging
 
-#     # Validate that context_chunk_list is a list
-#     if not isinstance(context_chunk_list, list):
-#         raise ValueError("context_chunk_list must be a list")
-
-#     # Validate that each chunk is a dictionary with 'content' key
-#     for chunk in context_chunk_list:
-#         if not isinstance(chunk, dict) or 'content' not in chunk:
-#             print("Invalid chunk:", chunk)
-#             raise ValueError("Each chunk must be a dictionary with a 'content' key")
-
-#     # Create context text by joining the content of each chunk
-#     context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
-
-#     # Prepare the prompt for the model
-#     prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}\n\nAnswer:"
-
-#     # Debugging: Print the prompt and context
-#     print("Sending request to the model with the prompt:")
-#     print(prompt)
-#     print("Context text:", context_text)
-
-#     try:
-#         # Call the Hugging Face Inference Client
-#         response = client.text_generation(prompt, max_new_tokens=100, return_full_text=False)
-#         print("Response:", response)
-#         return response.strip()
-#     except Exception as e:
-#         print("An error occurred:", e)
-
-import numpy as np
-from openai import OpenAI
-from django.conf import settings
-
-# Initialize the OpenAI client
-client = OpenAI(
-    api_key=settings.OPENAI_API_KEY,
-    base_url="https://api.gapgpt.app/v1"
-)
+# Configure logging for debugging and monitoring
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def generate_answer(question, context_chunks):
-    """Generate an answer based on the question and context chunks."""
-    context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+    """
+    Generate a detailed and accurate answer using Ollama's qwen3:0.6b model based on retrieved context chunks.
 
-    # Validate that context_chunk_list is a list
-    if not isinstance(context_chunk_list, list):
-        raise ValueError("context_chunk_list must be a list")
+    Args:
+        question (str): The user's question.
+        context_chunks (list): List of context chunks (either dict with 'content' key or plain strings).
 
-    # Validate that each chunk is a dictionary with 'content' key
-    for chunk in context_chunk_list:
-        if not isinstance(chunk, dict) or 'content' not in chunk:
-            print("Invalid chunk:", chunk)
-            raise ValueError("Each chunk must be a dictionary with a 'content' key")
+    Returns:
+        str: Generated answer from the model, or error message if failed.
+    """
+    
+    # Validate and format context text
+    context_text = ""
+    try:
+        if isinstance(context_chunks, list) and len(context_chunks) > 0:
+            if isinstance(context_chunks[0], dict) and 'content' in context_chunks[0]:
+                # Extract 'content' from each chunk dictionary
+                context_text = "\n\n".join(chunk['content'] for chunk in context_chunks if chunk.get('content'))
+            else:
+                # Assume list of strings
+                context_text = "\n\n".join(str(chunk) for chunk in context_chunks if str(chunk).strip())
+    except Exception as e:
+        logger.error(f"Error formatting context chunks: {e}")
+        return "Error: Could not process context chunks."
 
-    # Create context text by joining the content of each chunk
-    context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
+    # If no context is available, inform the model explicitly
+    if not context_text.strip():
+        context_text = "No relevant context found."
 
-    # Prepare the prompt for the model
-    prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}\n\nAnswer:"
+    # Optimized prompt for qwen3:0.6b to encourage detailed, accurate, and long-form answers
+    # Using clear instructions and structured format to guide the model
+    prompt = f"""You are a helpful, precise, and thorough AI assistant.
+Your task is to answer the user's question based ONLY on the provided context below.
+If the context does not contain enough information, say "I cannot answer based on the given context."
+Otherwise, provide a comprehensive, well-structured, and detailed response.
 
-    # Debugging: Print the prompt and context
-    print("Sending request to the model with the prompt:")
-    print(prompt)
-    print("Context text:", context_text)
+=== CONTEXT ===
+{context_text}
+=== END CONTEXT ===
+
+=== QUESTION ===
+{question}
+=== END QUESTION ===
+
+=== INSTRUCTIONS ===
+- Answer in Persian (Farsi).
+- Be detailed and thorough — aim for at least 3-5 sentences if possible.
+- Use bullet points or paragraphs for clarity.
+- Do NOT make up information — stick strictly to the context.
+- If context is irrelevant, say so clearly.
+=== ANSWER ===
+"""
+
+    # Ollama API endpoint
+    url = "http://localhost:11434/api/generate"
+    
+    # Model parameters optimized for longer, higher-quality responses
+    payload = {
+        "model": "qwen3:0.6b",
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.7,        # Slightly higher for more creative/longer responses
+            "top_p": 0.95,             # Broader token sampling
+            "num_predict": 256,        # Allow longer answers (was 100)
+            "num_ctx": 4096,           # Use larger context window if needed
+            "repeat_penalty": 1.1      # Slight penalty to avoid repetition
+        }
+    }
 
     try:
-        # Call the OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=100,
-            temperature=0.6,
-            top_p=0.9
-        )
+        # Send request to Ollama
+        logger.info(f"Sending request to Ollama for question: {question[:50]}...")
+        response = requests.post(url, json=payload, timeout=180)  # Increased timeout for longer generation
+        response.raise_for_status()
         
-        # Extract the answer
-        answer = response.choices[0].message.content.strip()
-        print("Response:", answer)
+        result = response.json()
+        answer = result.get("response", "").strip()
+        
+        # Fallback if model returns empty or refuses to answer
+        if not answer:
+            answer = "متاسفانه نمی‌توانم بر اساس اطلاعات موجود پاسخ دقیقی ارائه دهم."
+        
+        logger.info("Successfully received answer from Ollama.")
         return answer
 
+    except requests.exceptions.Timeout:
+        error_msg = "Error: Request to Ollama timed out. Try again or check if Ollama service is running."
+        logger.error(error_msg)
+        return error_msg
+
+    except requests.exceptions.RequestException as e:
+        error_msg = f"Error: Failed to connect to Ollama. Details: {str(e)}"
+        logger.error(error_msg)
+        return error_msg
+
     except Exception as e:
-        print("An error occurred:", e)
-        # Fallback to direct answer from context if available
-    
+        error_msg = f"Unexpected error in generate_answer: {str(e)}"
+        logger.error(error_msg)
+        return error_msg
