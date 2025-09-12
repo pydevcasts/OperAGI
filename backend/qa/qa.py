@@ -119,6 +119,7 @@ def generate_answer(question, context_chunks):
             else:
                 # Assume list of strings
                 context_text = "\n\n".join(str(chunk) for chunk in context_chunks if str(chunk).strip())
+        logger.info(f"✅ Context length: {len(context_text)} chars | {len(context_chunks)} chunks")
     except Exception as e:
         logger.error(f"Error formatting context chunks: {e}")
         return "Error: Could not process context chunks."
@@ -130,41 +131,42 @@ def generate_answer(question, context_chunks):
     # Optimized prompt for qwen3:0.6b to encourage detailed, accurate, and long-form answers
     # Using clear instructions and structured format to guide the model
     prompt = f"""You are a helpful, precise, and thorough AI assistant.
-Your task is to answer the user's question based ONLY on the provided context below.
-If the context does not contain enough information, say "I cannot answer based on the given context."
-Otherwise, provide a comprehensive, well-structured, and detailed response.
+                    Your task is to answer the user's question based ONLY on the provided context below.
+                    If the context does not contain enough information, say "I cannot answer based on the given context."
+                    Otherwise, provide a comprehensive, well-structured, and detailed response.
 
-=== CONTEXT ===
-{context_text}
-=== END CONTEXT ===
+                    === CONTEXT ===
+                    {context_text}
+                    === END CONTEXT ===
 
-=== QUESTION ===
-{question}
-=== END QUESTION ===
+                    === QUESTION ===
+                    {question}
+                    === END QUESTION ===
 
-=== INSTRUCTIONS ===
-- Answer in Persian (Farsi).
-- Be detailed and thorough — aim for at least 3-5 sentences if possible.
-- Use bullet points or paragraphs for clarity.
-- Do NOT make up information — stick strictly to the context.
-- If context is irrelevant, say so clearly.
-=== ANSWER ===
-"""
+                    === INSTRUCTIONS ===
+                    - Answer in Persian:.
+                    - Be detailed and thorough — aim for at least 8-24 sentences if possible.
+                    - Use bullet points or paragraphs for clarity.
+                    - Do NOT make up information — stick strictly to the context.
+                    - If context is irrelevant, say so clearly.
+                    === ANSWER ===
+            """
 
     # Ollama API endpoint
     url = "http://localhost:11434/api/generate"
     
     # Model parameters optimized for longer, higher-quality responses
     payload = {
-        "model": "qwen3:0.6b",
+        "model": "gemma3:latest",  # ← این مدل رو دارید؟ (نکته مهم بعداً)
         "prompt": prompt,
         "stream": False,
         "options": {
-            "temperature": 0.7,        # Slightly higher for more creative/longer responses
-            "top_p": 0.95,             # Broader token sampling
-            "num_predict": 256,        # Allow longer answers (was 100)
-            "num_ctx": 4096,           # Use larger context window if needed
-            "repeat_penalty": 1.1      # Slight penalty to avoid repetition
+            "temperature": 0.3,        # پایین = دقیق‌تر، کم‌تخیل
+            "top_p": 0.9,
+            "num_predict": 2048,       # ✅ افزایش شدید! (از 256 → 2048)
+            "num_ctx": 4096,           # ✅ مناسب برای context بلند
+            "repeat_penalty": 1.1,
+            "stop": []                 # ✅ ترجیحاً خالی بذارید — اگر stop باشه ممکن است زود قطع کنه
         }
     }
 
