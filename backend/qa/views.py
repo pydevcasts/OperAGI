@@ -57,7 +57,8 @@ class AskQuestionView(APIView):
 
         document_id = serializer.validated_data['document_id']
         question = serializer.validated_data['question']
-
+        profile = serializer.validated_data.get('profile', 'balanced')  # ✅ اضافه شد
+        language = serializer.validated_data.get('language', 'fa')  # ✅ اضافه شد
         # ✅ ۱. چک کن سند وجود داره
         try:
             document = Document.objects.get(id=document_id)
@@ -111,7 +112,12 @@ class AskQuestionView(APIView):
 
         # ✅ ۸. ارسال به مدل
         try:
-            answer = generate_answer(question, context_chunks)
+            answer = generate_answer(
+                                    question=question,
+                                    context_chunks=context_chunks,
+                                    profile=profile,
+                                    language=language  # ✅ ارسال زبان
+                                )
             return Response({"answer": answer}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"❌ Error in generate_answer: {str(e)}")
