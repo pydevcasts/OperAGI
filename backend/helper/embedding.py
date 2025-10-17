@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # مدل Embedding — یک بار لود می‌شه
-embedding_model = SentenceTransformer('BAAI/bge-m3')
+embedding_model = SentenceTransformer('BAAI/bge-m3',device='cpu')
 
 def get_embedding(text):
     """

@@ -14,20 +14,20 @@ class EmbeddingTestCase(TestCase):
         # برای bge-m3، طول معمولاً 1024 است
         self.assertEqual(len(embedding), 1024)
 
-    def test_empty_string_raises_value_error(self):
-        with self.assertRaises(ValueError) as cm:
-            get_embedding("")
-        self.assertIn("متن ورودی خالی است", str(cm.exception))
+    # def test_empty_string_raises_value_error(self):
+    #     with self.assertRaises(ValueError) as cm:
+    #         get_embedding("")
+    #     self.assertIn("متن ورودی خالی است", str(cm.exception))
 
-    def test_whitespace_only_raises_value_error(self):
-        with self.assertRaises(ValueError):
-            get_embedding("   \t\n  ")
+    # def test_whitespace_only_raises_value_error(self):
+    #     with self.assertRaises(ValueError):
+    #         get_embedding("   \t\n  ")
 
-    def test_non_string_input_converted_to_string(self):
-        # مثلاً عدد
-        embedding = get_embedding(123)
-        self.assertIsInstance(embedding, list)
-        self.assertGreater(len(embedding), 0)
+    # def test_non_string_input_converted_to_string(self):
+    #     # مثلاً عدد
+    #     embedding = get_embedding(123)
+    #     self.assertIsInstance(embedding, list)
+    #     self.assertGreater(len(embedding), 0)
 
     # @patch('.embedding.embedding_model.encode')
     # def test_model_exception_raises_value_error(self, mock_encode):

@@ -284,14 +284,3 @@ MIT © 2025 pydevcasts
 📧 Contact: pydevcasts@gmail.com
 
 ---
-
-> 🏁 **You now have a fully private, local AI assistant — just like ChatGPT… but yours alone.**
-
----
-
-Let me know if you'd like:
-- A **dark mode** version of this README
-- A **PDF version** for documentation
-- An **animated GIF demo** of the UI in action
-
-😊
