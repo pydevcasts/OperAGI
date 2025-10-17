@@ -283,4 +283,3 @@ MIT © 2025 pydevcasts
 🔗 GitHub: [https://github.com/pydevcasts/Operagi](https://github.com/pydevcasts/Operagi)  
 📧 Contact: pydevcasts@gmail.com
 
----
