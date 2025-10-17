@@ -1,6 +1,6 @@
-from sentence_transformers import SentenceTransformer
-import numpy as np
 import logging
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 # تنظیم لاگ
 logging.basicConfig(level=logging.INFO)

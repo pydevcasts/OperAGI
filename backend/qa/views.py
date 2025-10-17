@@ -1,5 +1,8 @@
 # 📄 qa/views.py — FINAL VERSION — با اصلاح خطای numpy.int64
 
+import numpy as np
+import faiss
+import logging
 from .qa import generate_answer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,9 +12,6 @@ from drf_yasg import openapi
 from .serializers import QuestionSerializer
 from documents.models import Document, DocumentChunk
 from helper.embedding import get_embedding
-import numpy as np
-import faiss
-import logging
 
 logger = logging.getLogger(__name__)
 
