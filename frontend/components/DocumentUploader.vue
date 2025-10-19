@@ -25,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDocumentStore } from '../stores/documentStore'
-import { useChatStore } from '../stores/chatStore'
+import { useDocumentStore } from '../../stores/documentStore'
+import { useChatStore } from '../../stores/chatStore'
 
 const title = ref('')
 const file = ref<File | null>(null)

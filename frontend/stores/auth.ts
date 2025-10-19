@@ -11,17 +11,17 @@ export const useAuthStore = defineStore('auth', () => {
       body: { email, password }
     })
     token.value = res.token // فرض می‌کنیم پاسخ شامل token باشد
-    localStorage.setItem('authToken', token.value)
+    localStorage.setItem('accessToken', token.value)
   }
 
   const logout = () => {
     token.value = null
-    localStorage.removeItem('authToken')
+    localStorage.removeItem('accessToken')
   }
 
   // بارگذاری توکن از localStorage در ابتدای اجرا
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('authToken')
+    const saved = localStorage.getItem('accessToken')
     if (saved) token.value = saved
   }
 

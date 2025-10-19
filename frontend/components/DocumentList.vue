@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDocumentStore } from '../stores/documentStore'
-import { useChatStore } from '../stores/chatStore'
+import { useDocumentStore } from '../../stores/documentStore'
+import { useChatStore } from '../../stores/chatStore'
 const documentStore = useDocumentStore()
 const chatStore = useChatStore()
 </script>

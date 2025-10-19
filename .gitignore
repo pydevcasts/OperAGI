@@ -10,7 +10,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -166,9 +165,8 @@ cython_debug/
 /node_modules
 /node_modules/
 node_modules/
-dist/
 npm-debug.log
-yarn-error.log
+
 
 upload/
 /upload/
@@ -183,8 +181,6 @@ audio/*
 ./audio/
 
 
-# Dependencies
-node_modules/
 
 # Build output
 .nuxt/
@@ -192,7 +188,6 @@ dist/
 .output/
 
 # Environment variables
-.env
 .env.local
 
 # Logs
@@ -205,3 +200,8 @@ yarn-error.log*
 .idea/
 *.swp
 .DS_Store
+
+./token.md 
+*.md 
+token.md
+token.md/
