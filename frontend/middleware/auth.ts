@@ -1,7 +1,8 @@
+
 // middleware/auth.ts
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(() => {
   const token = localStorage.getItem('accessToken')
-  if (!token && to.path !== '/login' && to.path !== '/register') {
+  if (!token) {
     return navigateTo('/login')
   }
 })

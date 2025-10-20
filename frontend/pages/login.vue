@@ -1,30 +1,25 @@
 <!-- pages/login.vue -->
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
+
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const authStore = useAuthStore()
+const router = useRouter()
 
 const handleLogin = async () => {
   try {
-    const response = await $fetch('/api/v1/user/token/', {
-      method: 'POST',
-      body: {
-        email: email.value,
-        password: password.value
-      }
-    })
-
-    // ✅ Fixed: use 'response', not 'res'
-    localStorage.setItem('accessToken', response.access)
-    localStorage.setItem('refreshToken', response.refresh)
-
-    navigateTo('/')
+    await authStore.login(email.value, password.value)
+    router.push('/') // ✅ redirect مطمئن
   } catch (err) {
     error.value = 'Invalid email or password.'
     console.error(err)
   }
 }
 </script>
+
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-900">
