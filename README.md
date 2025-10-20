@@ -1,4 +1,4 @@
-# 🚀 Operagi — Local AI-Powered Document Assistant  
+# 🚀 OperAGI — Local AI-Powered Document Assistant  
 ### Ask questions about your PDFs — powered by Qwen3:0.6b, running entirely on your machine ✨
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)
