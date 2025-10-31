@@ -1,161 +1,173 @@
-# import numpy as np
-# from huggingface_hub import InferenceApi
-# import json
 
-# # Initialize the Hugging Face Inference API
-# client = InferenceApi(repo_id="meta-llama/Meta-Llama-3-8B-Instruct", token="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")
+# 📄 helper/llm.py — Ollama Integration with qwen3:0.6b for RAG
 
-# def generate_answer(question, context_chunks):
-#     """Generate an answer based on the question and context chunks."""
-#     # Convert context_chunks to list if it's a NumPy array
-#     context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+import requests
+import logging
 
-#     # Validate that context_chunk_list is a list
-#     if not isinstance(context_chunk_list, list):
-#         raise ValueError("context_chunk_list must be a list")
-
-#     # Validate that each chunk is a dictionary with 'content' key
-#     for chunk in context_chunk_list:
-#         if not isinstance(chunk, dict) or 'content' not in chunk:
-#             print("Invalid chunk:", chunk)  # For debugging
-#             raise ValueError("Each chunk must be a dictionary with a 'content' key")
-
-#     # Create context text by joining the content of each chunk
-#     context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
-
-#     # Prepare the prompt for the model
-#     prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}"
-
-#     # Debugging: Print the prompt and context
-#     print("Sending request to the model with the prompt:")
-#     print(prompt)
-#     print("Context text:", context_text)
-
-#     try:
-#         # Call the Hugging Face Inference API with raw_response=True
-#         response = client(prompt, raw_response=True)
-
-#         # Check the status code
-#         if response.status_code != 200:
-#             print(f"Error: Received status code {response.status_code}")
-#             print("Response content:", response.text)
-#             return "An error occurred while receiving the response from the server."
-
-#         # Try to parse the response as text or JSON
-#         content_type = response.headers.get('content-type', '')
-#         if 'application/json' in content_type:
-#             response_json = response.json()
-#             if isinstance(response_json, list) and len(response_json) > 0:
-#                 return response_json[0].get('generated_text', '').strip()
-#             else:
-#                 return "No response found for your question."
-#         elif 'text/plain' in content_type:
-#             # Handle plain text response
-#             return response.text.strip()
-#         else:
-#             print(f"Unsupported content type: {content_type}")
-#             return "Unsupported response format from the server."
-
-#     except Exception as e:
-#         print("An error occurred:", e)
-#         return "An error occurred while processing the response."
+# Configure logging for debugging and monitoring
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-# ================================
-# import numpy as np
-# from huggingface_hub import InferenceClient
+# 🌍 Language mapping — for instruction in prompt
+LANGUAGE_MAP = {
+    "fa": "Persian (Farsi)",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "de": "German",
+    "zh": "Chinese",
+    "ar": "Arabic",
+    "ru": "Russian",
+    "ja": "Japanese",
+    "ko": "Korean"
+}
+# 📦 Predefined profiles for user selection
+MODEL_PROFILES = {
+    "quick": {
+        "model": "phi3:mini",
+        "num_predict": 128,
+        "temperature": 0.4,
+        "top_p": 0.9,
+        "description": "Fast, short answers — ideal for quick queries."
+    },
+    "balanced": {
+        "model": "gemma3:latest",
+        "num_predict": 512,
+        "temperature": 0.6,
+        "top_p": 0.9,
+        "description": "Good balance of speed and detail — recommended for most use cases."
+    },
+    "detailed": {
+        "model": "gemma3:latest",  # یا gemma:7b / llama3:8b
+        "num_predict": 2048,
+        "temperature": 0.3,
+        "top_p": 0.95,
+        "description": "Long, thorough, precise answers — best for research, documentation, or RAG."
+    },
+    "creative": {
+        "model": "llama3:8b",
+        "num_predict": 1536,
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "description": "More imaginative responses — useful for brainstorming or storytelling."
+    }
+}
+def generate_answer(question, context_chunks, profile="balanced",language="fa"):
+    """
+    Generate answer using Ollama with dynamic profile selection.
 
-# # Initialize the Hugging Face Inference Client
-# client = InferenceClient(
-#     model="distilgpt2",
-#     token="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"  # توکن API خود را وارد کنید
-# )
-# def generate_answer(question, context_chunks):
-#     """Generate an answer based on the question and context chunks."""
-#     context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+    Args:
+        question (str): User's question.
+        context_chunks (list): List of retrieved context chunks.
+        profile (str): One of: "quick", "balanced", "detailed", "creative"
+    """
 
-#     # Validate that context_chunk_list is a list
-#     if not isinstance(context_chunk_list, list):
-#         raise ValueError("context_chunk_list must be a list")
+    # Validate profile
+    if profile not in MODEL_PROFILES:
+        profile = "balanced"
+    if language not in LANGUAGE_MAP:
+        language = "fa"
 
-#     # Validate that each chunk is a dictionary with 'content' key
-#     for chunk in context_chunk_list:
-#         if not isinstance(chunk, dict) or 'content' not in chunk:
-#             print("Invalid chunk:", chunk)
-#             raise ValueError("Each chunk must be a dictionary with a 'content' key")
 
-#     # Create context text by joining the content of each chunk
-#     context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
+    profile_config = MODEL_PROFILES[profile]
+    model_name = profile_config["model"]
+    num_predict = profile_config["num_predict"]
+    temperature = profile_config["temperature"]
+    top_p = profile_config["top_p"]
+    target_language = LANGUAGE_MAP[language]
 
-#     # Prepare the prompt for the model
-#     prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}\n\nAnswer:"
+    # --- Format Context ---
+    context_text = ""
+    try:
+        if isinstance(context_chunks, list) and len(context_chunks) > 0:
+            if isinstance(context_chunks[0], dict) and 'content' in context_chunks[0]:
+                context_text = "\n\n".join(chunk['content'] for chunk in context_chunks if chunk.get('content', '').strip())
+            else:
+                context_text = "\n\n".join(str(chunk) for chunk in context_chunks if str(chunk).strip())
+    except Exception as e:
+        logger.error(f"❌ Error formatting context: {e}")
+        return "خطا: پردازش متن اسناد با مشکل مواجه شد."
 
-#     # Debugging: Print the prompt and context
-#     print("Sending request to the model with the prompt:")
-#     print(prompt)
-#     print("Context text:", context_text)
+    if not context_text.strip():
+        context_text = "هیچ اطلاعات مرتبطی یافت نشد."
 
-#     try:
-#         # Call the Hugging Face Inference Client
-#         response = client.text_generation(prompt, max_new_tokens=100, return_full_text=False)
-#         print("Response:", response)
-#         return response.strip()
-#     except Exception as e:
-#         print("An error occurred:", e)
+    # --- Prompt (همون قبلی، بدون تغییر) ---
+    prompt = f"""
+You are a helpful, precise, and thorough AI assistant.
+Your task is to answer the user's question based ONLY on the provided context below.
+If the context does not contain enough information, say "I cannot answer based on the given context."
+Otherwise, provide a comprehensive, well-structured, and detailed response.
 
-import numpy as np
-from openai import OpenAI
-from django.conf import settings
+=== CONTEXT ===
+{context_text}
+=== END CONTEXT ===
 
-# Initialize the OpenAI client
-client = OpenAI(
-    api_key=settings.OPENAI_API_KEY,
-    base_url="https://api.gapgpt.app/v1"
-)
+=== QUESTION ===
+{question}
+=== END QUESTION ===
 
-def generate_answer(question, context_chunks):
-    """Generate an answer based on the question and context chunks."""
-    context_chunk_list = context_chunks.tolist() if isinstance(context_chunks, np.ndarray) else context_chunks
+=== INSTRUCTIONS ===
+- Answer in {target_language} .
+- Be detailed and thorough — aim for at least 8–24 sentences.
+- Use bullet points or paragraphs for clarity.
+- Do NOT make up information — stick strictly to the context.
+- If context is irrelevant, say so clearly.
+=== ANSWER ===
+"""
 
-    # Validate that context_chunk_list is a list
-    if not isinstance(context_chunk_list, list):
-        raise ValueError("context_chunk_list must be a list")
+    url = "http://localhost:11434/api/generate"
 
-    # Validate that each chunk is a dictionary with 'content' key
-    for chunk in context_chunk_list:
-        if not isinstance(chunk, dict) or 'content' not in chunk:
-            print("Invalid chunk:", chunk)
-            raise ValueError("Each chunk must be a dictionary with a 'content' key")
-
-    # Create context text by joining the content of each chunk
-    context_text = "\n\n".join(chunk['content'] for chunk in context_chunk_list)
-
-    # Prepare the prompt for the model
-    prompt = f"Question: {question}\n\nAnswer based on the following information:\n\n{context_text}\n\nAnswer:"
-
-    # Debugging: Print the prompt and context
-    print("Sending request to the model with the prompt:")
-    print(prompt)
-    print("Context text:", context_text)
+    payload = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+            "top_p": top_p,
+            "num_predict": num_predict,
+            "num_ctx": 4096,
+            "repeat_penalty": 1.1,
+            "stop": []
+        }
+    }
 
     try:
-        # Call the OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=100,
-            temperature=0.6,
-            top_p=0.9
-        )
-        
-        # Extract the answer
-        answer = response.choices[0].message.content.strip()
-        print("Response:", answer)
+        logger.info(f"📡 Sending request with profile '{profile}' | Model: {model_name} | Lang={language} | Predict: {num_predict} tokens")
+        response = requests.post(url, json=payload, timeout=180)
+        response.raise_for_status()
+        result = response.json()
+        answer = result.get("response", "").strip()
+
+        if not answer:
+            fallback = {
+                "fa": "متاسفانه نمی‌توانم پاسخ دهم.",
+                "en": "Unfortunately, I cannot answer.",
+                "es": "Lamentablemente, no puedo responder.",
+                "fr": "Malheureusement, je ne peux pas répondre.",
+                "de": "Leider kann ich nicht antworten.",
+                "zh": "很遗憾，我无法回答。",
+                "ar": "للأسف، لا يمكنني الإجابة.",
+                "ru": "К сожалению, я не могу ответить.",
+                "ja": "残念ながら、答えられません。",
+                "ko": "죄송합니다, 답변할 수 없습니다."
+            }
+            answer = fallback.get(language, "Unable to respond.")
+
+        logger.info(f"✅ Answer generated ({len(answer)} chars)")
         return answer
 
+        logger.info(f"✅ Answer generated successfully ({len(answer)} chars)")
+        return answer
+
+    except requests.exceptions.Timeout:
+        logger.error("❌ Request timed out.")
+        return "خطا: زمان پاسخ مدل به پایان رسید."
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Failed to connect to Ollama: {e}")
+        return f"خطا در ارتباط با مدل: {str(e)}"
     except Exception as e:
-        print("An error occurred:", e)
-        # Fallback to direct answer from context if available
+        logger.error(f"❌ Unexpected error: {e}")
+        return f"خطای ناشناخته: {str(e)}"
     
+

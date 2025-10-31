@@ -64,23 +64,18 @@ class UploadDocumentView(APIView):
     def post(self, request):
         serializer = UploadedDocumentSerializer(data=request.data)
         if serializer.is_valid():
-            # Save the document without user if not authenticated
             document = serializer.save(user=request.user if request.user.is_authenticated else None)
             try:
-                # Extract text from the saved file
                 text = extract_text_from_file(document.file.path)
-                # Split text into chunks
                 chunks = chunk_text(text, max_chunk_size=500)
-                # Generate and store embeddings for each chunk
                 for idx, chunk in enumerate(chunks):
                     embedding = get_embedding(chunk)
-                    # Handle different embedding formats
                     if isinstance(embedding, np.ndarray):
                         embedding_list = embedding.tolist()
                     elif isinstance(embedding, dict) and 'embedding' in embedding:
                         embedding_list = embedding['embedding']
                     elif isinstance(embedding, list):
-                        embedding_list = embedding  # Already a list
+                        embedding_list = embedding
                     else:
                         raise ValueError(f"Unexpected embedding format: {type(embedding)}")
                     DocumentChunk.objects.create(
@@ -89,12 +84,10 @@ class UploadDocumentView(APIView):
                         embedding=embedding_list,
                         index=idx
                     )
-                # Mark document as processed
                 document.processed = True
                 document.save()
                 return Response({'message': 'File processed and chunks stored successfully'}, status=status.HTTP_201_CREATED)
             except Exception as e:
-                # Delete document if processing fails
                 document.delete()
                 return Response({'error': f"Failed to process file: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

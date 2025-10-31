@@ -1,59 +1,19 @@
-# from django.shortcuts import render
+# 📄 qa/views.py — FINAL VERSION — با اصلاح خطای numpy.int64
 
-# # Create your views here.
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from embeddings.embedding import get_embedding
-# from .search import retrieve_relevant_chunks
-# from .qa import generate_answer
-
-# class AskQuestionView(APIView):
-#     def post(self, request):
-#         question = request.data.get("question")
-#         query_embedding = get_embedding(question)
-#         relevant_chunks = retrieve_relevant_chunks(query_embedding)
-#         answer = generate_answer(question, relevant_chunks)
-
-#         return Response({"answer": answer})
-
-
-
-
-from django.shortcuts import render
-from qa.serializers import QuestionSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from helper.embedding import get_embedding
-from .search import retrieve_relevant_chunks
+import numpy as np
+import faiss
+import logging
 from .qa import generate_answer
-from rest_framework import status
-# class AskQuestionView(APIView):
-#     def post(self, request):
-#         print("Request data:", request.data)  # For debugging
-#         question = request.data.get("question")
-        
-#         if not question:  # Check if question is None or empty
-#             return Response({"error": "سوال نمی‌تواند خالی باشد."}, status=400)
-
-#         query_embedding = get_embedding(question)
-#         relevant_chunks = retrieve_relevant_chunks(query_embedding)
-#         answer = generate_answer(question, relevant_chunks)
-
-#         return Response({"answer": answer})
-    
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-from .serializers import QuestionSerializer  # فرض بر این است که این serializer شماست
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import serializers
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from .serializers import QuestionSerializer
+from documents.models import Document, DocumentChunk
+from helper.embedding import get_embedding
 
+logger = logging.getLogger(__name__)
 
 
 class AskQuestionView(APIView):
@@ -74,7 +34,16 @@ class AskQuestionView(APIView):
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        'question': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING), description='List of errors')
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message')
+                    }
+                )
+            ),
+            404: openapi.Response(
+                description='Document Not Found',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Document not found')
                     }
                 )
             )
@@ -83,18 +52,73 @@ class AskQuestionView(APIView):
     def post(self, request):
         serializer = QuestionSerializer(data=request.data)
         
-        if serializer.is_valid():
-            question = serializer.validated_data.get('question')
-            embedding = get_embedding(question)
-            
-            # Retrieve relevant chunks from the database
-            relevant_chunks = retrieve_relevant_chunks(embedding, top_k=3)
-            
-            # Convert chunks to list of dictionaries with 'content' key
-            context_chunks = [{'content': chunk.content} for chunk in relevant_chunks]
-            
-            # Generate the answer
-            answer = generate_answer(question, context_chunks)
-            return Response({"answer": answer}, status=status.HTTP_200_OK)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        document_id = serializer.validated_data['document_id']
+        question = serializer.validated_data['question']
+        profile = serializer.validated_data.get('profile', 'balanced')  # ✅ اضافه شد
+        language = serializer.validated_data.get('language', 'fa')  # ✅ اضافه شد
+        # ✅ ۱. چک کن سند وجود داره
+        try:
+            document = Document.objects.get(id=document_id)
+        except Document.DoesNotExist:
+            return Response({"error": "سند یافت نشد."}, status=status.HTTP_404_NOT_FOUND)
+
+        # ✅ ۲. Embedding سوال رو بگیر
+        try:
+            logger.info(f"🔍 Generating embedding for question: {question[:50]}...")
+            question_embedding = get_embedding(question)
+            logger.info(f"✅ Question embedding length: {len(question_embedding)}")
+            
+            # تبدیل به NumPy array برای FAISS
+            question_embedding = np.array(question_embedding).astype('float32').reshape(1, -1)
+            logger.info(f"📊 Question embedding shape: {question_embedding.shape}")
+        except Exception as e:
+            logger.error(f"❌ Failed to generate embedding for question: {question} | Error: {str(e)}")
+            return Response({"error": f"خطا در Embedding: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # ✅ ۳. چانک‌های این سند رو بگیر — و به لیست تبدیل کن
+        chunks_queryset = DocumentChunk.objects.filter(document=document).order_by('index')
+        if not chunks_queryset.exists():
+            return Response({"error": "این سند هنوز پردازش نشده یا چانکی ندارد."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # ✅ تبدیل QuerySet به لیست — برای جلوگیری از مشکلات numpy.int64
+        chunks = list(chunks_queryset)
+
+        # ✅ ۴. Embeddingهای چانک‌ها رو بارگذاری کن
+        try:
+            chunk_embeddings = np.array([chunk.embedding for chunk in chunks]).astype('float32')
+            logger.info(f"🧠 Loaded {len(chunks)} chunk embeddings. Shape: {chunk_embeddings.shape}")
+        except Exception as e:
+            logger.error(f"❌ Failed to load chunk embeddings: {str(e)}")
+            return Response({"error": f"خطا در بارگذاری Embedding چانک‌ها: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # ✅ ۵. FAISS رو راه‌اندازی کن
+        dimension = chunk_embeddings.shape[1]
+        index = faiss.IndexFlatL2(dimension)
+        index.add(chunk_embeddings)
+
+        # ✅ ۶. جستجوی k=3 چانک مرتبط
+        D, I = index.search(question_embedding, k=3)
+        logger.info(f"🔎 FAISS results — Indices: {I[0]} | Distances: {D[0]}")
+
+        # ✅ اصلاح خطا: تبدیل numpy.int64 به int
+        retrieved_chunks = [chunks[int(i)] for i in I[0]]  # ✅ int(i) — کلید اصلی رفع خطا
+
+        # ✅ ۷. تبدیل به فرمت مورد نیاز generate_answer
+        context_chunks = [{'content': chunk.content} for chunk in retrieved_chunks]
+        logger.info(f"📚 Retrieved {len(context_chunks)} chunks for context.")
+
+        # ✅ ۸. ارسال به مدل
+        try:
+            answer = generate_answer(
+                                    question=question,
+                                    context_chunks=context_chunks,
+                                    profile=profile,
+                                    language=language  # ✅ ارسال زبان
+                                )
+            return Response({"answer": answer}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"❌ Error in generate_answer: {str(e)}")
+            return Response({"error": f"خطا در تولید پاسخ: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+.nuxt/
+dist/
+.output/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+.DS_Store

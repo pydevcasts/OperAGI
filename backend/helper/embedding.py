@@ -1,56 +1,46 @@
-# import openai
-# import os
-
-
-# def get_embedding(question, model="text-embedding-3-small"):
-#     response = openai.Embedding.create(
-#         input=question,
-#         model=model
-#     )
-#     return response.data[0].embedding
-
-
-
-
-# ! pip install -U FlagEmbedding
-
-# from FlagEmbedding import BGEM3FlagModel
-
-
-# # بارگذاری مدل
-# model = BGEM3FlagModel('BAAI/bge-m3', use_fp16=True)
-
-# def get_embedding(question):
-#     # استفاده از مدل برای تولید embedding
-#     output = model.encode("what is capital of america", return_dense=True, return_sparse=True, return_colbert_vecs=True)
-#     return output['dense_vecs'][0]  # بازگشت embedding
-
-
-
-
-
-# from sentence_transformers import SentenceTransformer
-# embedding.py
-from FlagEmbedding import BGEM3FlagModel
-
-# بارگذاری مدل
-# model = BGEM3FlagModel('BAAI/bge-m3', use_fp16=True)
-
-
-# def get_embedding(question):
-#     """Use the model to generate an embedding for the dynamic question."""
-#     output = model.encode(question, return_dense=True, return_sparse=True, return_colbert_vecs=True)
-#     return output
-
-    # return output['dense_vecs'][0]  # بازگشت embedding
-    # return output['colbert_vecs'][0]  # بازگش
+import logging
+import numpy as np
 from sentence_transformers import SentenceTransformer
 
-embedding_model = SentenceTransformer('BAAI/bge-m3')
+# تنظیم لاگ
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# مدل Embedding — یک بار لود می‌شه
+embedding_model = SentenceTransformer('BAAI/bge-m3',device='cpu')
 
 def get_embedding(text):
-    """Generate embedding for the text using BAAI/bge-m3."""
-    if not text.strip():
-        raise ValueError("Input text is empty")
-    embedding = embedding_model.encode(text, normalize_embeddings=True)
-    return embedding  # Should return a NumPy array
+    """
+    Generate embedding for the given text.
+    Returns a Python list of floats.
+    Raises ValueError if text is empty or invalid.
+    """
+    try:
+        # حذف فضاهای اضافی
+        text = str(text).strip()
+        
+        if not text:
+            raise ValueError("متن ورودی خالی است.")
+        
+        # تولید Embedding
+        embedding = embedding_model.encode(text, normalize_embeddings=True)
+        
+        # تبدیل به لیست پایتون
+        if isinstance(embedding, np.ndarray):
+            embedding_list = embedding.tolist()
+        else:
+            embedding_list = list(embedding)
+        
+        # اعتبارسنجی خروجی
+        if not isinstance(embedding_list, list) or len(embedding_list) == 0:
+            raise ValueError("Embedding تولید شده نامعتبر است.")
+        
+        if not all(isinstance(x, (int, float)) for x in embedding_list):
+            raise ValueError("Embedding حاوی مقادیر غیرعددی است.")
+        
+        logger.info(f"✅ Embedding generated successfully. Length: {len(embedding_list)}")
+        return embedding_list
+
+    except Exception as e:
+        logger.error(f"❌ Error in get_embedding: {str(e)} | Input: '{text}'")
+        raise ValueError(f"خطا در تولید Embedding: {str(e)}")
