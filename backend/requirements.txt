@@ -91,3 +91,5 @@ websocket-client==1.8.0
 wheel==0.42.0
 wsproto==1.2.0
 zope.interface==7.2
+dj-rest-auth[with_social]
+mock
