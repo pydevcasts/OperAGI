@@ -235,7 +235,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 
 
-# جایگزین کن با:
+
 ACCOUNT_LOGIN_METHODS = {'email'}  # فقط با ایمیل
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # بدون نام کاربری

@@ -15,3 +15,10 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL or "http://127.0.0.1:8000/api/v1/auth/google/callback/"
     client_class = OAuth2Client
+    def post(self, request, *args, **kwargs):
+        print("Received POST data:", request.data)
+        try:
+            return super().post(request, *args, **kwargs)
+        except Exception as e:
+            print("Google Login Error:", str(e))
+            raise
