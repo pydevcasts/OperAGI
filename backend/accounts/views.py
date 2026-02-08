@@ -22,3 +22,4 @@ class GoogleLogin(SocialLoginView):
         except Exception as e:
             print("Google Login Error:", str(e))
             raise
+    

@@ -73,3 +73,18 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+1. کاربر با گوگل وارد می‌شود
+   ↓
+2. Better Auth سیشن ایجاد می‌کند (در کوکی)
+   ↓
+3. صفحه کالبک بارگذاری می‌شود
+   ↓
+4. اطلاعات کاربر از Better Auth دریافت می‌شود
+   ↓
+5. اطلاعات به بک‌اند ارسال می‌شود
+   ↓
+6. بک‌اند کاربر را در دیتابیس ذخیره می‌کند
+   ↓
+7. بک‌اند توکن JWT برمی‌گرداند
+   ↓
+8. توکن‌ها و اطلاعات کاربر در localStorage ذخیره می‌شود

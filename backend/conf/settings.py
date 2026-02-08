@@ -55,6 +55,7 @@ SITE_ID = 1
 AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,34 +125,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# CORS
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True  # فقط در توسعه
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
-    ]
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept', 'accept-encoding', 'authorization', 'content-type',
-    'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
-]
-
-# CSRF
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "http://127.0.0.1:3000",  # برای فرانت‌اند
-    "http://localhost:3000",
-]
-
-
 
 # Static
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Allauth
 ACCOUNT_ADAPTER = "allauth.account.adapter.DefaultAccountAdapter"
@@ -164,6 +140,7 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,  # برای فرانت‌اند
     'PASSWORD_RESET_USE_SITES_DOMAIN': False,
     'OLD_PASSWORD_FIELD_ENABLED': True,
+    
 }
 
 # REST Framework + SimpleJWT
@@ -197,7 +174,6 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-
 # Email (Gmail)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -207,15 +183,57 @@ EMAIL_HOST_USER = 'pydevcasts@gmail.com'
 EMAIL_HOST_PASSWORD = 'xjbu hmch wezu tiuj'  # App Password
 DEFAULT_FROM_EMAIL = 'Operagi <pydevcasts@gmail.com>'
 
-
-
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
 GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL')
 
 
-# Social Account Providers
+# Allauth Account Settings
+ACCOUNT_LOGIN_METHODS = {'email'}  # فقط با ایمیل
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Allauth + dj-rest-auth اضافی
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Google SCOPE کامل‌تر
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
@@ -224,6 +242,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': ''
         },
         'SCOPE': [
+            'openid',     # ← اضافه شد
             'profile',
             'email',
         ],
@@ -232,10 +251,3 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-
-
-
-
-ACCOUNT_LOGIN_METHODS = {'email'}  # فقط با ایمیل
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # بدون نام کاربری

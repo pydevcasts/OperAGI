@@ -1,14 +1,21 @@
 <!-- pages/login.vue -->
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth'
+import GoogleLoginButton from '~/components/GoogleLoginButton.vue'
 import { useRouter } from 'vue-router'
-import GoogleLoginButton from '../components/GoogleLoginButton.vue'
+import { ref } from 'vue'
+import { createAuthClient } from 'better-auth/client'
+import { useRuntimeConfig } from '#imports'
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
-const authStore = useAuthStore()
 const router = useRouter()
+const config = useRuntimeConfig()
+
+// کلاینت Better Auth
+const authClient = createAuthClient({
+  baseURL: config.public.betterAuthUrl
+})
 
 const handleLogin = async (e: Event) => {
   e.preventDefault()
@@ -20,9 +27,17 @@ const handleLogin = async (e: Event) => {
   }
 
   try {
-    await authStore.login(email.value, password.value)
+    // ورود با ایمیل و رمز عبور از طریق Better Auth
+    const result = await authClient.signIn.email({
+      email: email.value,
+      password: password.value,
+      callbackURL: '/'
+    })
+    
+    console.log('Login successful:', result)
     router.push('/')
   } catch (err: any) {
+    console.error('Login error:', err)
     error.value = err.message || 'ورود ناموفق بود.'
   }
 }
@@ -50,25 +65,10 @@ const handleLogin = async (e: Event) => {
             </div>
           </div>
 
-          <input
-            v-model="email"
-            type="email"
-            placeholder="ایمیل"
-            class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-          <input
-            v-model="password"
-            type="password"
-            placeholder="رمز عبور"
-            class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
+          <input v-model="email" type="email" placeholder="ایمیل" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input v-model="password" type="password" placeholder="رمز عبور" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 
-          <button
-            type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition"
-          >
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition">
             ورود
           </button>
 
@@ -82,8 +82,8 @@ const handleLogin = async (e: Event) => {
           <NuxtLink to="/register" class="text-indigo-400 hover:underline">ثبت‌نام کنید</NuxtLink>
         </p>
         <p class="mt-4 text-center text-gray-400 text-sm">
-  <NuxtLink to="/forgot-password" class="text-indigo-400 hover:underline">فراموشی رمز عبور؟</NuxtLink>
-</p>
+          <NuxtLink to="/forgot-password" class="text-indigo-400 hover:underline">فراموشی رمز عبور؟</NuxtLink>
+        </p>
       </div>
     </div>
   </div>
