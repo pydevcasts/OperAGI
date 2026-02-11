@@ -5,13 +5,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   ssr: false,
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-auth-utils'],
 
   runtimeConfig: {
-    betterAuthSecret: '',
-    googleClientSecret: '',
     public: {
-      betterAuthUrl: 'http://localhost:3000',
       googleOAuthClientId: '',
       apiBase: 'http://127.0.0.1:8000/api/v1'
     }
@@ -30,10 +27,6 @@ export default defineNuxtConfig({
     }
   },
   
-  // اضافه کردن externals برای better-auth
-  nitro: {
-    externals: {
-      inline: ['better-auth']
-    }
-  }
+  
+
 })

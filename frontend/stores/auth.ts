@@ -36,22 +36,26 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const isAuthenticated = computed(() => !!accessToken.value)
 
-  // بارگذاری از localStorage
+  
+  // ✅ بارگذاری از localStorage با تأخیر
   if (typeof window !== 'undefined') {
-    accessToken.value = localStorage.getItem('accessToken')
-    refreshToken.value = localStorage.getItem('refreshToken')
-    
-    // بارگذاری اطلاعات کاربر
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        user.value = JSON.parse(storedUser)
-        console.log('✅ [Auth Store] اطلاعات کاربر از localStorage بارگذاری شد')
-      } catch (error) {
-        console.error('❌ [Auth Store] خطا در بارگذاری اطلاعات کاربر:', error)
+    // تأخیر برای اطمینان از بارگذاری کامل
+    setTimeout(() => {
+      accessToken.value = localStorage.getItem('accessToken')
+      refreshToken.value = localStorage.getItem('refreshToken')
+      
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          user.value = JSON.parse(storedUser)
+          console.log('✅ [Auth Store] اطلاعات کاربر از localStorage بارگذاری شد')
+        } catch (error) {
+          console.error('❌ [Auth Store] خطا در بارگذاری اطلاعات کاربر:', error)
+        }
       }
-    }
+    }, 200)
   }
+
 
   // ورود با ایمیل و رمز
   const login = async (email: string, password: string) => {
