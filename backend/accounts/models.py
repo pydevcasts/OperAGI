@@ -43,7 +43,25 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)  # ✅ افزودن این خط
+    google_id = models.CharField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True,
+        verbose_name="Google ID"
+    )
 
+    profile_picture = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name="تصویر پروفایل"
+    )
+
+    is_email_verified = models.BooleanField(
+        default=False,
+        verbose_name="ایمیل تأیید شده"
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

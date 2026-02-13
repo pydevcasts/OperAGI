@@ -1,25 +1,22 @@
 # accounts/views.py
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-from django.conf import settings
-from dj_rest_auth.registration.views import RegisterView
-from accounts.serializers import RegisterSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import GoogleLoginSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-RegisterView.serializer_class = RegisterSerializer
-
-
-
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL or "http://127.0.0.1:8000/api/v1/auth/google/callback/"
-    client_class = OAuth2Client
-    def post(self, request, *args, **kwargs):
-        print("Received POST data:", request.data)
-        try:
-            return super().post(request, *args, **kwargs)
-        except Exception as e:
-            print("Google Login Error:", str(e))
-            raise
-    
+class GoogleLogin(APIView):
+    def post(self, request):
+        serializer = GoogleLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.create_or_update_user(serializer.validated_data)
+            return Response({
+                'message': 'User synced successfully',
+                'user_id': user.id,
+                'email': user.email
+            }, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

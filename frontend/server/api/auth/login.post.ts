@@ -1,35 +1,52 @@
 // server/api/auth/login.post.ts
 import { readBody } from 'h3'
-import { hashPassword, verifyPassword } from 'nuxt-auth-utils/server/utils/crypto' // اگر نیاز به hash داری
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { email, password } = body
 
   if (!email || !password) {
-    throw createError({ statusCode: 400, message: 'ایمیل و رمز عبور الزامی است' })
+    throw createError({
+      statusCode: 400,
+      message: 'Email and password are required'
+    })
   }
 
-  // اینجا منطق ورود با Django یا DB خودت رو پیاده کن
-  // مثال ساده (در واقعیت به Django API کال کن):
   try {
-    // فرض کنیم یک user در DB داری (یا به Django POST کن)
-    // const user = await $fetch('http://127.0.0.1:8000/api/v1/login', {
-    //   method: 'POST',
-    //   body: { email, password }
-    // })
+    // درخواست به Django
+  const djangoRes = await $fetch('http://127.0.0.1:8000/api/v1/rest-auth/login/', {
+  method: 'POST',
+  body: {
+    login: email,
+    password
+  },
+  headers: { 'Content-Type': 'application/json' }
+})
 
-    // اگر موفق بود:
+    if (!djangoRes.key) {
+      throw new Error('No token received from backend')
+    }
+
+    // ذخیره session در cookie (server-side)
     await setUserSession(event, {
       user: {
         email,
-        // name, id, ... از Django بگیر
+        name: email.split('@')[0]
       },
-      authProvider: 'credentials'
+      tokens: {
+        access: djangoRes.key
+        // اگر refresh هم داری: refresh: djangoRes.refresh_token
+      },
+      authProvider: 'credentials',
+      lastLogin: new Date().toISOString()
     })
 
-    return { success: true, message: 'ورود موفق' }
-  } catch (err) {
-    throw createError({ statusCode: 401, message: 'ایمیل یا رمز عبور اشتباه است' })
+    return { success: true }
+  } catch (err: any) {
+    console.error('Backend login error:', err)
+    throw createError({
+      statusCode: 401,
+      message: err.data?.non_field_errors?.[0] || 'Invalid credentials'
+    })
   }
 })

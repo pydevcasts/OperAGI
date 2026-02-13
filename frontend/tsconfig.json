@@ -23,7 +23,7 @@
     "types/**/*.d.ts",
     "server/**/*.ts",          // ← مهم: فایل‌های server/api و server/utils را پوشش می‌دهد
     "plugins/**/*.ts",         // ← اگر پلاگین داری
-    "composables/**/*.ts"      // ← اگر composable داری
+    "composables/**/*.ts"     // ← اگر composable داری
   ],
 
   "exclude": [

@@ -141,6 +141,7 @@ REST_AUTH = {
     'PASSWORD_RESET_USE_SITES_DOMAIN': False,
     'OLD_PASSWORD_FIELD_ENABLED': True,
     
+    
 }
 
 # REST Framework + SimpleJWT
