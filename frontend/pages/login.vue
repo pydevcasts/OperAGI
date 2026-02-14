@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import GoogleLoginButton from '~/components/GoogleLoginButton.vue'
 import { useAuthStore } from '~/stores/auth'
+import { nextTick } from 'vue'
 
 const authStore = useAuthStore()
 
@@ -12,7 +13,7 @@ const loading = ref(false)
 
 const handleCredentialsLogin = async (e: Event) => {
   e.preventDefault()
-  
+
   error.value = ''
   loading.value = true
 
@@ -21,18 +22,26 @@ const handleCredentialsLogin = async (e: Event) => {
 
     await authStore.login(email.value.trim(), password.value)
 
-    console.log('Credentials login successful → redirecting')
+    console.log('Credentials login successful in store')
 
-    await navigateTo('/dashboard') // یا '/' یا مسیر دلخواه
+    // اطمینان از لود شدن session جدید در client-side
+    const session = useUserSession()
+    await session.fetch()
+    console.log('Session refreshed after login:', session.value)
+
+    // صبر کوچک برای اطمینان از بروزرسانی UI
+    await nextTick()
+window.location.href = '/'
 
   } catch (err: any) {
     console.error('Credentials login error:', err)
 
-    const serverMessage = err?.data?.non_field_errors?.[0] ||
-                           err?.data?.detail ||
-                           err?.data?.message ||
-                           err?.message ||
-                           'Login failed. Please check your email and password.'
+    const serverMessage =
+      err?.data?.non_field_errors?.[0] ||
+      err?.data?.detail ||
+      err?.data?.message ||
+      err?.message ||
+      'ورود ناموفق بود. لطفاً ایمیل و رمز عبور را بررسی کنید.'
 
     error.value = serverMessage
   } finally {
@@ -47,7 +56,7 @@ const handleCredentialsLogin = async (e: Event) => {
       <div class="bg-gray-800/90 backdrop-blur rounded-2xl shadow-xl p-8 border border-gray-700">
         
         <h2 class="text-3xl font-bold text-white text-center mb-8">
-          Sign in to Operagi
+          ورود به Operagi
         </h2>
 
         <GoogleLoginButton />
@@ -57,7 +66,7 @@ const handleCredentialsLogin = async (e: Event) => {
             <div class="w-full border-t border-gray-600"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-gray-800 text-gray-400">or continue with email</span>
+            <span class="px-4 bg-gray-800 text-gray-400">یا با ایمیل و رمز عبور وارد شوید</span>
           </div>
         </div>
 
@@ -65,7 +74,7 @@ const handleCredentialsLogin = async (e: Event) => {
           <input
             v-model="email"
             type="email"
-            placeholder="Email"
+            placeholder="ایمیل"
             required
             autocomplete="email"
             class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
@@ -74,7 +83,7 @@ const handleCredentialsLogin = async (e: Event) => {
           <input
             v-model="password"
             type="password"
-            placeholder="Password"
+            placeholder="رمز عبور"
             required
             autocomplete="current-password"
             class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
@@ -85,7 +94,7 @@ const handleCredentialsLogin = async (e: Event) => {
             :disabled="loading"
             class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
           >
-            {{ loading ? 'Signing in...' : 'Sign In' }}
+            {{ loading ? 'در حال ورود...' : 'ورود' }}
           </button>
 
           <p v-if="error" class="text-red-400 text-center text-sm mt-4 animate-pulse">
@@ -95,18 +104,25 @@ const handleCredentialsLogin = async (e: Event) => {
 
         <div class="mt-6 text-center text-gray-400 text-sm space-y-2">
           <div>
-            Don't have an account?
+            حساب کاربری ندارید؟
             <NuxtLink to="/register" class="text-indigo-400 hover:underline ml-1">
-              Sign up
+              ثبت‌نام کنید
             </NuxtLink>
           </div>
           <div>
             <NuxtLink to="/forgot-password" class="text-indigo-400 hover:underline">
-              Forgot password?
+              رمز عبور را فراموش کرده‌اید؟
             </NuxtLink>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+input:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+</style>

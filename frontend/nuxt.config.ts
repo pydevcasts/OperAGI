@@ -1,20 +1,23 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-import { defineNuxtConfig } from 'nuxt/config'
-
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-  ssr: false,
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-auth-utils'],
+  // ssr: false,  ← این را حذف یا کامنت کن
+  ssr: true,     // ← این را اضافه کن یا true کن
+
+  modules: ['nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/tailwindcss'],
 
   runtimeConfig: {
     public: {
-      googleOAuthClientId: '',
       apiBase: 'http://127.0.0.1:8000/api/v1'
+    },
+    session: {
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7 // ۷ روز
+      }
     }
   },
 
-  // حذف vite.config.ts و استفاده از اینجا
   vite: {
     server: {
       proxy: {
@@ -25,8 +28,5 @@ export default defineNuxtConfig({
         }
       }
     }
-  },
-  
-  
-
+  }
 })
