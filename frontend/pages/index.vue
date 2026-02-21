@@ -1,65 +1,23 @@
 <!-- pages/index.vue -->
 <script setup lang="ts">
-const session = useUserSession() // بدون import – auto-import فعال است
-const loggedIn = computed(() => !!session.value?.user)
-const loadingSession = ref(true)
-const fetchError = ref<string | null>(null)
+const { user, loggedIn, fetch: fetchSession, clear } = useUserSession()
 
-const fetchSession = async (source = 'initial') => {
-  try {
-    console.log(`[${source}] Fetching session...`)
-    await session.fetch()
-    console.log(`[${source}] Session after fetch:`, session.value)
-    console.log(`[${source}] loggedIn:`, loggedIn.value)
-    console.log(`[${source}] User:`, session.value?.user)
-  } catch (err) {
-    fetchError.value = err.message || 'خطا در لود session'
-    console.error(`[${source}] Fetch session error:`, err)
-  }
-}
-
-// لود در server و client
-onServerPrefetch(async () => {
-  await fetchSession('SSR prefetch')
-})
-
+// لود session در client-side
 onMounted(async () => {
-  await fetchSession('Client onMounted')
-  loadingSession.value = false
-
-  // retry بعد از ۵۰۰ms اگر هنوز لود نشده
-  setTimeout(async () => {
-    if (!session.value?.user) {
-      console.log('Retry fetch after delay...')
-      await fetchSession('Retry after delay')
-    }
-  }, 500)
+  await fetchSession()
+  console.log('Session loaded in client:', { loggedIn: loggedIn.value, user: user.value })
 })
 
 // خروج ساده
 const simpleLogout = async () => {
-  await session.clear()
-  console.log('Session cleared')
-}
-
-// خروج کامل
-const fullLogout = async () => {
-  await session.clear()
-  await navigateTo('/logout')
+  await clear()
+  await navigateTo('/login')
 }
 </script>
 
 <template>
   <div class="p-8 text-white min-h-screen bg-gray-900">
-    <div v-if="loadingSession" class="text-center text-xl mt-20">
-      در حال بررسی وضعیت ورود...
-    </div>
-
-    <div v-else-if="fetchError" class="text-center text-red-400 text-xl mt-20">
-      خطا: {{ fetchError }}
-    </div>
-
-    <div v-else-if="loggedIn" class="max-w-2xl mx-auto">
+    <div v-if="loggedIn" class="max-w-2xl mx-auto">
       <h1 class="text-4xl font-bold mb-8 text-center">
         خوش آمدی {{ user?.name || 'کاربر' }}!
       </h1>
@@ -77,17 +35,10 @@ const fullLogout = async () => {
 
         <div class="flex justify-center gap-6 mt-8">
           <button
-            @click="fullLogout"
+            @click="simpleLogout"
             class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg"
           >
-            خروج کامل
-          </button>
-
-          <button
-            @click="simpleLogout"
-            class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg"
-          >
-            خروج ساده
+            خروج
           </button>
         </div>
       </div>

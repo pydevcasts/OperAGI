@@ -1,20 +1,26 @@
 export default defineNuxtConfig({
-  // ssr: false,  ← این را حذف یا کامنت کن
-  ssr: true,     // ← این را اضافه کن یا true کن
+  ssr: true,
 
-  modules: ['nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/tailwindcss'],
+  modules: [
+    'nuxt-auth-utils',
+    '@pinia/nuxt',
+    '@nuxtjs/tailwindcss'
+  ],
 
   runtimeConfig: {
-    public: {
-      apiBase: 'http://127.0.0.1:8000/api/v1'
-    },
+    // ✅ session باید مستقیم زیر runtimeConfig باشه، نه داخل public
     session: {
+      password: process.env.NUXT_SESSION_PASSWORD, // حداقل ۳۲ کاراکتر
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7 // ۷ روز
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/'
       }
+    },
+    public: {
+      apiBase: 'http://127.0.0.1:8000/api/v1'
     }
   },
 
@@ -26,7 +32,13 @@ export default defineNuxtConfig({
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api\/v1/, '')
         }
+        // ❌ '/api/_auth' رو کامل حذف کن
       }
     }
+  },
+
+  nitro: {
+    compressPublicAssets: true
+    // ❌ prerender برای صفحاتی که auth دارن نباشه
   }
 })
