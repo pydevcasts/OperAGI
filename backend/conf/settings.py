@@ -140,7 +140,8 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,  # برای فرانت‌اند
     'PASSWORD_RESET_USE_SITES_DOMAIN': False,
     'OLD_PASSWORD_FIELD_ENABLED': True,
-    
+    'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializer',
+
     
 }
 

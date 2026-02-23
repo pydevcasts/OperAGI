@@ -1,54 +1,24 @@
 {
-  "files": [],
-
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
-    }
-  ],
-
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.vue",
-    "types/**/*.d.ts",
-    "server/**/*.ts",          // ← مهم: فایل‌های server/api و server/utils را پوشش می‌دهد
-    "plugins/**/*.ts",         // ← اگر پلاگین داری
-    "composables/**/*.ts"     // ← اگر composable داری
-  ],
-
-  "exclude": [
-    "node_modules",
-    ".nuxt",
-    "dist"
-  ],
-
+  "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"]
-    },
-    "types": [
-      "@nuxt/types",
-      "@pinia/nuxt",
-      "vite/client"
-    ]
-  }
+    }
+  },
+  "include": [
+    "types/**/*.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    "dist"
+  ]
 }

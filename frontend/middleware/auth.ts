@@ -1,3 +1,5 @@
+import { defineNuxtRouteMiddleware } from "nuxt/app"
+
 // middleware/auth.ts
 export default defineNuxtRouteMiddleware(async (to) => {
   const { loggedIn } = useUserSession()
@@ -5,4 +7,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!loggedIn.value) {
     return navigateTo('/?login-required')
   }
+  
 })

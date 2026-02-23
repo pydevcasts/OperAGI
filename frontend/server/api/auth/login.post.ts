@@ -21,7 +21,7 @@ try {
 
   if (!djangoRes.access) {
     console.log('No access token in djangoRes!')
-    throw new Error('No access token received')
+    throw createError({ statusCode: 502, message: 'No access token from Django' })
   }
 
   console.log('Access token found:', djangoRes.access.substring(0, 20) + '...')

@@ -1,4 +1,9 @@
 // plugins/polyfill.client.ts
+
+import { defineNuxtPlugin } from "nuxt/app"
+
+export default defineNuxtPlugin(() => {
+
 if (typeof File === 'undefined') {
   (globalThis as any).File = class File extends Blob {
     name: string
@@ -11,3 +16,5 @@ if (typeof File === 'undefined') {
     }
   }
 }
+
+})
