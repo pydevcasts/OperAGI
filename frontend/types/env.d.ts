@@ -13,9 +13,5 @@ declare namespace NodeJS {
     VITE_BETTER_AUTH_URL?: string
     VITE_API_BASE_URL?: string
 
-    // اگر متغیرهای دیگری در .env داری (مثلاً OpenAI یا چیزهای دیگر)، اینجا اضافه کن
-    // مثال:
-    // OPENAI_API_KEY?: string
-    // NODE_ENV?: "development" | "production" | "test"
   }
 }

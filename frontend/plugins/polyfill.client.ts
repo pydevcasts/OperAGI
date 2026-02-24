@@ -1,20 +1,20 @@
 // plugins/polyfill.client.ts
-
-import { defineNuxtPlugin } from "nuxt/app"
-
 export default defineNuxtPlugin(() => {
+  // فقط اگر واقعاً وجود نداره polyfill کن
+  if (typeof globalThis.File === 'undefined') {
+    globalThis.File = class File extends Blob {
+      name: string = ''
+      lastModified: number = 0
 
-if (typeof File === 'undefined') {
-  (globalThis as any).File = class File extends Blob {
-    name: string
-    lastModified: number
-
-    constructor(fileBits: BlobPart[], fileName: string, options?: FilePropertyBag) {
-      super(fileBits, options)
-      this.name = fileName
-      this.lastModified = options?.lastModified ?? Date.now()
-    }
+      constructor(
+        fileBits: BlobPart[],
+        fileName: string,
+        options?: FilePropertyBag
+      ) {
+        super(fileBits, options)
+        this.name = fileName
+        this.lastModified = options?.lastModified ?? Date.now()
+      }
+    } as typeof File // برای type-safety بهتر
   }
-}
-
 })

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تأیید ایمیل</title>
+</head>
+<body style="margin:0;padding:0;background:#080b14;font-family:'Segoe UI',Tahoma,sans-serif;direction:rtl;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#080b14;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <span style="font-size:28px;vertical-align:middle;">⬡</span>
+              <span style="font-size:22px;font-weight:700;color:#e2e8f0;vertical-align:middle;margin-right:8px;">OperAGI</span>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background:#0f1423;border:1px solid #1e293b;border-radius:20px;padding:40px;">
+
+              <!-- Icon -->
+              <div style="text-align:center;margin-bottom:24px;">
+                <span style="font-size:48px;">✉️</span>
+              </div>
+
+              <!-- Title -->
+              <h1 style="margin:0 0 8px;text-align:center;font-size:22px;font-weight:700;color:#f1f5f9;">
+                تأیید آدرس ایمیل
+              </h1>
+              <p style="margin:0 0 8px;text-align:center;font-size:14px;color:#64748b;line-height:1.6;">
+                سلام {{ user.get_full_name|default:user.email }}،
+              </p>
+              <p style="margin:0 0 32px;text-align:center;font-size:14px;color:#64748b;line-height:1.6;">
+                برای فعال‌سازی حساب کاربری خود روی دکمه زیر کلیک کنید.
+              </p>
+
+              <!-- Button -->
+              <div style="text-align:center;margin-bottom:32px;">
+                <a href="{{ activate_url }}"
+                   style="display:inline-block;padding:14px 36px;background:#6366f1;color:#ffffff;text-decoration:none;border-radius:10px;font-size:15px;font-weight:600;">
+                  تأیید ایمیل
+                </a>
+              </div>
+
+              <!-- Divider -->
+              <hr style="border:none;border-top:1px solid #1e293b;margin:0 0 24px;">
+
+              <!-- Fallback link -->
+              <p style="margin:0 0 8px;font-size:13px;color:#475569;text-align:center;">
+                اگر دکمه کار نکرد، این لینک را کپی کنید:
+              </p>
+              <p style="margin:0 0 24px;font-size:12px;color:#6366f1;text-align:center;word-break:break-all;">
+                {{ activate_url }}
+              </p>
+
+              <!-- Warning -->
+              <div style="padding:14px;background:#1a1200;border:1px solid #78350f;border-radius:10px;">
+                <p style="margin:0;font-size:13px;color:#fbbf24;text-align:center;">
+                  ⚠️ اگر این حساب را نساختید، این ایمیل را نادیده بگیرید.
+                </p>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding-top:24px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#334155;">
+                © 2026 OperAGI — پلتفرم هوش مصنوعی
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

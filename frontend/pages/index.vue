@@ -1,8 +1,11 @@
 <!-- pages/dashboard.vue -->
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+import {ref} from 'vue'
 
-const { user, clear } = useUserSession()
+// pages/dashboard.vue
+definePageMeta({}) // ← بدون middleware
+
+const { user, clear, loggedIn } = useUserSession()
 
 const handleLogout = async () => {
   await clear()
@@ -134,7 +137,7 @@ const recentActivity = [
         <NuxtLink
           v-for="item in navItems"
           :key="item.id"
-          :to="item.to"
+          :to="loggedIn ? '/item.to' : '/login'"
           :class="['nav-item', { 'nav-active': activeNav === item.id }]"
           @click="activeNav = item.id; sidebarOpen = false"
         >
@@ -239,7 +242,7 @@ const recentActivity = [
           <NuxtLink
             v-for="(s, i) in services"
             :key="s.id"
-            :to="s.to"
+            :to="loggedIn ? '/s.to' : '/login'"
             class="service-card"
             :style="{ '--glow': s.glow, animationDelay: i * 0.07 + 's' }"
           >

@@ -1,4 +1,3 @@
-// server/api/auth/login.post.ts
 import { readBody } from 'h3'
 
 export default defineEventHandler(async (event) => {
@@ -10,24 +9,44 @@ export default defineEventHandler(async (event) => {
   }
 
   console.log('Sending credentials to Django:', { email, password: '***' })
-try {
-  const djangoRes = await $fetch('http://127.0.0.1:8000/api/v1/rest-auth/login/', {
-    method: 'POST',
-    body: { email, password },
-    headers: { 'Content-Type': 'application/json' }
-  })
 
-  console.log('Raw Django response:', JSON.stringify(djangoRes, null, 2))
+  let djangoRes: any
 
+  try {
+    djangoRes = await $fetch('http://127.0.0.1:8000/api/v1/rest-auth/login/', {
+      method: 'POST',
+      body: { email, password },
+      headers: { 'Content-Type': 'application/json' }
+    })
+  } catch (err: any) {
+    // ← اینجا پیام دقیق Django رو لاگ میکنیم
+    console.error('Django login error:', JSON.stringify(err.data, null, 2))
+
+    const djangoMessage = err.data?.non_field_errors?.[0] || err.data?.detail || ''
+
+    const isUnverified =
+      djangoMessage.toLowerCase().includes('e-mail') ||
+      djangoMessage.toLowerCase().includes('verif') ||
+      djangoMessage.toLowerCase().includes('confirm')
+
+    if (isUnverified) {
+      throw createError({ statusCode: 403, message: 'email_not_verified' })
+    }
+
+    throw createError({ statusCode: 401, message: djangoMessage || 'Invalid credentials' })
+  }
+
+  // ← اگه به اینجا رسیدیم یعنی لاگین موفق بود
   if (!djangoRes.access) {
-    console.log('No access token in djangoRes!')
     throw createError({ statusCode: 502, message: 'No access token from Django' })
   }
 
-  console.log('Access token found:', djangoRes.access.substring(0, 20) + '...')
-
   await setUserSession(event, {
-    user: { email, name: email.split('@')[0] },
+    user: {
+      email,
+      name: djangoRes.user?.first_name || email.split('@')[0],
+      is_email_verified: true
+    },
     tokens: {
       access: djangoRes.access,
       refresh: djangoRes.refresh || null
@@ -36,11 +55,6 @@ try {
     lastLogin: new Date().toISOString()
   })
 
-  console.log('Session successfully set with tokens')
+  console.log('Session successfully set')
   return { success: true }
-} catch (err) {
-  console.error('Login route error:', err)
-  throw createError({ statusCode: 401, message: 'Invalid credentials' })
-}
-
 })

@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 ]
-SITE_ID = 1
+SITE_ID = 4
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -129,8 +129,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Static
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Allauth
-ACCOUNT_ADAPTER = "allauth.account.adapter.DefaultAccountAdapter"
+
 
 # dj_rest_auth + JWT
 REST_AUTH = {
@@ -226,6 +225,14 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Allauth + dj-rest-auth اضافی
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+FRONTEND_URL = 'http://localhost:3000'
+PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}'
+ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # ← ایمیل باید تأیید بشه
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'

@@ -32,13 +32,13 @@ export default defineNuxtConfig({
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api\/v1/, '')
         }
-        // ❌ '/api/_auth' رو کامل حذف کن
+
       }
     }
   },
 
   nitro: {
     compressPublicAssets: true
-    // ❌ prerender برای صفحاتی که auth دارن نباشه
+  
   }
 })

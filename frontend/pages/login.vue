@@ -1,7 +1,7 @@
 <!-- pages/login.vue -->
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 
 
 
@@ -12,7 +12,6 @@ const password = ref('')
 const error = ref('')
 const loading = ref(false)
 const showPassword = ref(false)
-
 const handleLogin = async (e: Event) => {
   e.preventDefault()
   error.value = ''
@@ -20,17 +19,19 @@ const handleLogin = async (e: Event) => {
 
   try {
     await authStore.login(email.value.trim(), password.value)
-    const session = useUserSession()
-    await session.fetch()
-    await nextTick()
     window.location.href = '/'
   } catch (err: any) {
-    error.value =
-      err?.data?.non_field_errors?.[0] ||
-      err?.data?.detail ||
-      err?.data?.message ||
-      err?.message ||
-      'ورود ناموفق بود. لطفاً ایمیل و رمز عبور را بررسی کنید.'
+    const message = err?.data?.message || err?.message || ''
+
+   if (err?.data?.statusCode === 403 || message === 'email_not_verified') {
+  await navigateTo({
+    path: '/email-not-verified',
+    query: { email: email.value.trim() } // ← ایمیل رو پاس بده
+  })
+  return
+}
+
+    error.value = message || 'ورود ناموفق بود.'
   } finally {
     loading.value = false
   }
