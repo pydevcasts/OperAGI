@@ -1,0 +1,27 @@
+@use '../variables' as v;
+
+.auth-page {
+  background: v.$bg-root;
+  color: v.$text-primary;
+  font-family: v.$font-main;
+
+  .auth-card {
+    background: v.$bg-card;
+    border: 1px solid v.$border-color;
+    border-radius: v.$radius-card;
+  }
+
+  .auth-input {
+    background: v.$bg-field;
+    border-radius: v.$radius-input;
+    color: v.$text-primary;
+
+    &:focus {
+      border-color: v.$border-focus;
+    }
+
+    &::placeholder {
+      color: v.$text-placeholder;
+    }
+  }
+}

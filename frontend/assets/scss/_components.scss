@@ -1,0 +1,24 @@
+@use 'variables' as v;
+
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: v.$bg-google-btn;
+  border: 1px solid v.$border-google;
+  border-radius: v.$radius-btn;
+  color: v.$text-secondary;
+  font-family: v.$font-main;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+}

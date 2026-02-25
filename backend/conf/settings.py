@@ -227,7 +227,8 @@ CSRF_TRUSTED_ORIGINS = [
 # Allauth + dj-rest-auth اضافی
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
-FRONTEND_URL = 'http://localhost:3000'
+# development
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}'
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True

@@ -1,0 +1,324 @@
+@use '../variables' as v;
+
+// ─── Page Layout ──────────────────────────────────────
+.login-page {
+  font-family: v.$font-main;
+  min-height: 100vh;
+  background: v.$bg-root;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+  padding: 2rem 1rem;
+}
+
+// ─── Background Effects ───────────────────────────────
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+
+  &-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+    top: -150px;
+    right: -100px;
+    animation: float 8s ease-in-out infinite;
+  }
+
+  &-2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    bottom: -100px;
+    left: -80px;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+// ─── Container ────────────────────────────────────────
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+// ─── Brand ────────────────────────────────────────────
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: v.$text-secondary;
+
+  &-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, v.$color-primary, v.$color-primary-light);
+    border-radius: v.$radius-brand-icon;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 24px v.$color-primary-glow;
+  }
+
+  &-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, v.$text-secondary, v.$text-muted);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+// ─── Card ─────────────────────────────────────────────
+.card {
+  width: 100%;
+  background: v.$bg-card;
+  border: 1px solid v.$border-color;
+  border-radius: v.$radius-card;
+  padding: 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px v.$color-primary-soft,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  &-header {
+    margin-bottom: 1.5rem;
+  }
+
+  &-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: v.$text-primary;
+    margin: 0 0 0.3rem;
+    letter-spacing: -0.02em;
+  }
+
+  &-subtitle {
+    font-size: 0.875rem;
+    color: v.$text-subtle;
+    margin: 0;
+  }
+
+  &-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+}
+
+// ─── Divider ──────────────────────────────────────────
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+
+  &-line {
+    flex: 1;
+    height: 1px;
+    background: v.$border-color;
+  }
+
+  &-text {
+    font-size: 0.8rem;
+    color: v.$text-dim;
+    white-space: nowrap;
+  }
+}
+
+// ─── Form ─────────────────────────────────────────────
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: v.$error-bg;
+  border: 1px solid v.$error-border;
+  border-radius: v.$radius-btn;
+  padding: 0.75rem 1rem;
+  color: v.$error-text;
+  font-size: 0.85rem;
+}
+
+// ─── Field ────────────────────────────────────────────
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  &-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &-label {
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: v.$text-muted;
+  }
+
+  &-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: v.$bg-field;
+    border: 1px solid v.$border-light;
+    border-radius: v.$radius-input;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus-within {
+      border-color: v.$border-focus;
+      box-shadow: 0 0 0 3px v.$color-primary-focus;
+    }
+  }
+
+  &-icon {
+    position: absolute;
+    right: 0.85rem;
+    color: v.$text-dim;
+    pointer-events: none;
+  }
+
+  &-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: v.$text-secondary;
+    font-family: v.$font-main;
+    font-size: 0.9rem;
+    padding: 0.75rem 2.4rem 0.75rem 2.8rem;
+    direction: ltr;
+    text-align: left;
+
+    &::placeholder {
+      color: v.$text-placeholder;
+    }
+  }
+}
+
+// ─── Links ────────────────────────────────────────────
+.forgot-link {
+  font-size: 0.775rem;
+  color: v.$color-primary;
+  text-decoration: none;
+  transition: color 0.15s;
+
+  &:hover { color: v.$color-primary-light; }
+}
+
+.footer-text { color: v.$text-dim; }
+
+.footer-link {
+  color: #818cf8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+
+  &:hover { color: #a5b4fc; }
+}
+
+// ─── Eye Button ───────────────────────────────────────
+.eye-btn {
+  position: absolute;
+  left: 0.7rem;
+  background: none;
+  border: none;
+  color: v.$text-dim;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+
+  &:hover { color: v.$text-muted; }
+}
+
+// ─── Submit Button ────────────────────────────────────
+.submit-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, v.$color-primary, v.$color-primary-light);
+  border: none;
+  border-radius: v.$radius-btn;
+  color: white;
+  font-family: v.$font-main;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px v.$color-primary-glow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px v.$color-primary-glow-hover;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Loading Dots ─────────────────────────────────────
+.loading-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  span {
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+// ─── Shake Transition ─────────────────────────────────
+.shake-enter-active {
+  animation: shake 0.4s ease;
+}

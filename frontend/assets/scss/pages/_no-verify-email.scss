@@ -1,0 +1,79 @@
+@use '../variables' as v;
+
+// ─── Page Layout ──────────────────────────────────────
+.page {
+  font-family: v.$font-main;
+  min-height: 100vh;
+  background: v.$bg-root;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+  padding: 2rem 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+// ─── State Box ────────────────────────────────────────
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+// ─── Mail Icon ────────────────────────────────────────
+.mail-icon {
+  font-size: 2.5rem;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 50%;
+  margin-bottom: 0.25rem;
+}
+
+// ─── Success Icon ─────────────────────────────────────
+.success-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(52, 211, 153, 0.08);
+  border-radius: 50%;
+  margin-bottom: 0.25rem;
+}
+
+// ─── Text ─────────────────────────────────────────────
+.state-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: v.$text-primary;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.state-desc {
+  font-size: 0.875rem;
+  color: v.$text-subtle;
+  margin: 0;
+  line-height: 1.7;
+}

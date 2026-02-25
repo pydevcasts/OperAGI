@@ -1,16 +1,22 @@
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   ssr: true,
 
   modules: [
     'nuxt-auth-utils',
     '@pinia/nuxt',
-    '@nuxtjs/tailwindcss'
+    // ❌ @nuxtjs/tailwindcss حذف شد
   ],
 
+  css: [
+  '~/assets/scss/tailwind.css',  // ✅ Tailwind — فایل CSS خالص
+  '~/assets/scss/main.scss',     // ✅ SCSS — متغیرها + استایل‌های صفحات
+],
+
   runtimeConfig: {
-    // ✅ session باید مستقیم زیر runtimeConfig باشه، نه داخل public
     session: {
-      password: process.env.NUXT_SESSION_PASSWORD, // حداقل ۳۲ کاراکتر
+      password: process.env.NUXT_SESSION_PASSWORD,
       cookie: {
         httpOnly: true,
         secure: false,
@@ -25,20 +31,19 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    plugins: [tailwindcss()], // ✅ اینجا فقط plugins
     server: {
       proxy: {
         '/api/v1': {
           target: 'http://127.0.0.1:8000',
           changeOrigin: true,
-          rewrite: path => path.replace(/^\/api\/v1/, '')
+          rewrite: (path: string) => path.replace(/^\/api\/v1/, '')
         }
-
       }
     }
   },
 
   nitro: {
     compressPublicAssets: true
-  
   }
 })

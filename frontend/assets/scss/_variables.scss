@@ -1,0 +1,39 @@
+// ─── Colors ───────────────────────────────────────────
+$bg-root:            #080b14;
+$bg-card:            rgba(15, 20, 35, 0.85);
+$bg-field:           rgba(255, 255, 255, 0.04);
+$bg-google-btn:      rgba(255, 255, 255, 0.05);
+
+$color-primary:      #6366f1;
+$color-primary-light:#8b5cf6;
+$color-primary-glow: rgba(99, 102, 241, 0.35);
+$color-primary-glow-hover: rgba(99, 102, 241, 0.45);
+$color-primary-focus:rgba(99, 102, 241, 0.12);
+$color-primary-soft: rgba(99, 102, 241, 0.08);
+
+$text-primary:       #f1f5f9;
+$text-secondary:     #e2e8f0;
+$text-muted:         #94a3b8;
+$text-subtle:        #64748b;
+$text-dim:           #475569;
+$text-placeholder:   #334155;
+
+$border-color:       rgba(255, 255, 255, 0.07);
+$border-light:       rgba(255, 255, 255, 0.08);
+$border-google:      rgba(255, 255, 255, 0.1);
+$border-focus:       rgba(99, 102, 241, 0.6);
+
+$error-bg:           rgba(239, 68, 68, 0.1);
+$error-border:       rgba(239, 68, 68, 0.25);
+$error-text:         #fca5a5;
+
+$success-color:      #34d399;
+
+// ─── Typography ───────────────────────────────────────
+$font-main:          'Vazirmatn', sans-serif;
+
+// ─── Border Radius ────────────────────────────────────
+$radius-card:        20px;
+$radius-input:       10px;
+$radius-btn:         10px;
+$radius-brand-icon:  12px;

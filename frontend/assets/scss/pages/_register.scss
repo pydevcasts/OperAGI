@@ -1,0 +1,59 @@
+@use '../variables' as v;
+
+// ─── Page Layout ──────────────────────────────────────
+.register-page {
+  font-family: v.$font-main;
+  min-height: 100vh;
+  background: v.$bg-root;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+  padding: 2rem 1rem;
+}
+
+// ─── Container ────────────────────────────────────────
+.register-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+// ─── Password Strength ────────────────────────────────
+.strength-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 0.35rem;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.3s ease, background 0.3s ease;
+
+  &.strength-weak   { background: #ef4444; }
+  &.strength-medium { background: #f59e0b; }
+  &.strength-strong { background: v.$success-color; }
+}
+
+// ─── Field Error State ────────────────────────────────
+.field-input-wrap.field-error {
+  border-color: v.$error-border;
+  box-shadow: 0 0 0 3px v.$error-bg;
+}
+
+.field-hint-error {
+  font-size: 0.775rem;
+  color: v.$error-text;
+  margin: 0.2rem 0 0;
+}

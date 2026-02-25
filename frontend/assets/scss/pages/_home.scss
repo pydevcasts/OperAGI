@@ -1,0 +1,6 @@
+@use '../variables' as v;
+
+.home-page {
+  background: v.$bg-root;
+  color: v.$text-primary;
+}

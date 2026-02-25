@@ -1,0 +1,9 @@
+@use 'auth';
+@use 'login';
+@use 'register';
+@use 'forgot-password';
+@use 'no-verify-email';
+@use 'home';
+@use 'verify-email';
+@use 'reset-password';
+@use 'dashboard';
