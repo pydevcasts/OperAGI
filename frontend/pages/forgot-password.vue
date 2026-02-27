@@ -16,36 +16,37 @@ const submit = async () => {
       method: 'POST',
       body: { email: email.value }
     })
-    message.value = (res as any).message || 'لینک بازیابی به ایمیل شما ارسال شد.'
+    message.value = (res as any).message || 'Recovery link has been sent to your email.'
     submitted.value = true
   } catch (err: any) {
     const data = err?.data
 
-    // ساختارهای مختلف پاسخ خطا از سرور
+    // Various error response structures from server
     const serverMsg =
       data?.message ||
       data?.error ||
       data?.detail ||
       (typeof data === 'string' ? data : null)
 
-    // پیام‌های فارسی بر اساس status code
+    // English error messages based on status code
     const statusMessages: Record<number, string> = {
-      400: 'ایمیل وارد شده معتبر نیست.',
-      404: 'حساب کاربری با این ایمیل یافت نشد.',
-      429: 'درخواست‌های زیادی ارسال کردید. لطفاً کمی صبر کنید.',
-      500: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+      400: 'The entered email is invalid.',
+      404: 'No account found with this email.',
+      429: 'Too many requests. Please try again later.',
+      500: 'Server error. Please try again later.',
     }
 
     const status = err?.status || err?.statusCode || data?.statusCode
     error.value =
       (typeof serverMsg === 'string' ? serverMsg : null) ||
       statusMessages[status] ||
-      'خطا در ارسال درخواست. لطفاً دوباره تلاش کنید.'
+      'Error sending request. Please try again.'
   } finally {
     loading.value = false
   }
 }
 </script>
+
 <template>
   <div class="page">
     <div class="bg-orb bg-orb-1" />
@@ -77,10 +78,10 @@ const submit = async () => {
                 <path d="M9 16l5 5 9-9" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
-            <h2 class="success-title">ایمیل ارسال شد</h2>
+            <h2 class="success-title">Email Sent</h2>
             <p class="success-desc">{{ message }}</p>
-            <p class="success-hint">اگر ایمیل دریافت نکردید، پوشه اسپم را بررسی کنید.</p>
-            <NuxtLink to="/login" class="back-btn">بازگشت به ورود</NuxtLink>
+            <p class="success-hint">If you don't receive the email, please check your spam folder.</p>
+            <NuxtLink to="/login" class="back-btn">Back to Login</NuxtLink>
           </div>
         </Transition>
 
@@ -93,8 +94,8 @@ const submit = async () => {
                   <path d="M8 1a4 4 0 00-4 4v1H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm0 1.5A2.5 2.5 0 0110.5 5v1h-5V5A2.5 2.5 0 018 2.5zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
                 </svg>
               </div>
-              <h1 class="card-title">فراموشی رمز عبور</h1>
-              <p class="card-subtitle">ایمیل خود را وارد کنید تا لینک بازیابی برایتان ارسال شود.</p>
+              <h1 class="card-title">Forgot Password</h1>
+              <p class="card-subtitle">Enter your email and we'll send you a recovery link.</p>
             </div>
 
             <form @submit.prevent="submit" class="form" novalidate>
@@ -110,7 +111,7 @@ const submit = async () => {
 
               <!-- Email field -->
               <div class="field">
-                <label class="field-label">آدرس ایمیل</label>
+                <label class="field-label">Email Address</label>
                 <div class="field-input-wrap">
                   <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M2 4a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-.5a.5.5 0 00-.5.5v.379l4.5 3 4.5-3V4a.5.5 0 00-.5-.5H4zm8.5 2.121l-4.5 3-4.5-3V12a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5.621z" />
@@ -129,7 +130,7 @@ const submit = async () => {
 
               <!-- Submit -->
               <button type="submit" class="submit-btn" :disabled="loading || !email">
-                <span v-if="!loading">ارسال لینک بازیابی</span>
+                <span v-if="!loading">Send Recovery Link</span>
                 <span v-else class="loading-dots">
                   <span /><span /><span />
                 </span>
@@ -141,7 +142,7 @@ const submit = async () => {
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M15 8a.5.5 0 01-.5.5H2.707l3.147 3.146a.5.5 0 01-.708.708l-4-4a.5.5 0 010-.708l4-4a.5.5 0 01.708.708L2.707 7.5H14.5A.5.5 0 0115 8z" />
                 </svg>
-                برگشت به ورود
+                Back to Login
               </NuxtLink>
             </div>
           </div>
@@ -151,4 +152,3 @@ const submit = async () => {
     </div>
   </div>
 </template>
-

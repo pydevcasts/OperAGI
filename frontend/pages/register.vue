@@ -24,13 +24,13 @@ const register = async () => {
   errorMsg.value = ''
 
   try {
-   await $fetch('/api/auth/register', {
-  method: 'POST',
-  body: { email: email.value, password: password.value }
-})
+    await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: { email: email.value, password: password.value }
+    })
     await navigateTo('/login')
   } catch (err: any) {
-    errorMsg.value = err?.data?.message || 'خطایی رخ داد. لطفاً دوباره تلاش کنید.'
+    errorMsg.value = err?.data?.message || 'An error occurred. Please try again.'
   } finally {
     loading.value = false
   }
@@ -59,8 +59,8 @@ const register = async () => {
       <!-- Card -->
       <div class="card">
         <div class="card-header">
-          <h1 class="card-title">ایجاد حساب کاربری</h1>
-          <p class="card-subtitle">به خانواده ما بپیوندید</p>
+          <h1 class="card-title">Create Account</h1>
+          <p class="card-subtitle">Join our community</p>
         </div>
 
         <form @submit.prevent="register" class="form" novalidate>
@@ -76,7 +76,7 @@ const register = async () => {
 
           <!-- Email -->
           <div class="field">
-            <label class="field-label">ایمیل</label>
+            <label class="field-label">Email</label>
             <div class="field-input-wrap">
               <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2 4a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-.5a.5.5 0 00-.5.5v.379l4.5 3 4.5-3V4a.5.5 0 00-.5-.5H4zm8.5 2.121l-4.5 3-4.5-3V12a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5.621z"/>
@@ -94,7 +94,7 @@ const register = async () => {
 
           <!-- Password -->
           <div class="field">
-            <label class="field-label">رمز عبور</label>
+            <label class="field-label">Password</label>
             <div class="field-input-wrap">
               <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M8 1a4 4 0 00-4 4v1H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm0 1.5A2.5 2.5 0 0110.5 5v1h-5V5A2.5 2.5 0 018 2.5zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
@@ -102,7 +102,7 @@ const register = async () => {
               <input
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="حداقل ۸ کاراکتر"
+                placeholder="At least 8 characters"
                 class="field-input"
                 autocomplete="new-password"
                 dir="ltr"
@@ -131,7 +131,7 @@ const register = async () => {
 
           <!-- Confirm Password -->
           <div class="field">
-            <label class="field-label">تکرار رمز عبور</label>
+            <label class="field-label">Confirm Password</label>
             <div class="field-input-wrap" :class="{ 'field-error': confirmPassword && !passwordMatch }">
               <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M8 1a4 4 0 00-4 4v1H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm0 1.5A2.5 2.5 0 0110.5 5v1h-5V5A2.5 2.5 0 018 2.5zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
@@ -139,7 +139,7 @@ const register = async () => {
               <input
                 v-model="confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
-                placeholder="رمز عبور را تکرار کنید"
+                placeholder="Confirm your password"
                 class="field-input"
                 autocomplete="new-password"
                 dir="ltr"
@@ -153,12 +153,12 @@ const register = async () => {
                 </svg>
               </button>
             </div>
-            <p v-if="confirmPassword && !passwordMatch" class="field-hint-error">رمز عبور مطابقت ندارد</p>
+            <p v-if="confirmPassword && !passwordMatch" class="field-hint-error">Passwords do not match</p>
           </div>
 
           <!-- Submit -->
           <button type="submit" class="submit-btn" :disabled="!isFormValid || loading">
-            <span v-if="!loading">ایجاد حساب</span>
+            <span v-if="!loading">Create Account</span>
             <span v-else class="loading-dots">
               <span /><span /><span />
             </span>
@@ -166,8 +166,8 @@ const register = async () => {
         </form>
 
         <div class="card-footer">
-          <span class="footer-text">قبلاً حساب دارید؟</span>
-          <NuxtLink to="/login" class="footer-link">ورود به حساب</NuxtLink>
+          <span class="footer-text">Already have an account?</span>
+          <NuxtLink to="/login" class="footer-link">Sign In</NuxtLink>
         </div>
       </div>
     </div>

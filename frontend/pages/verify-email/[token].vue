@@ -1,3 +1,4 @@
+<!-- pages/verify-email/[token].vue  -->
 <script setup lang="ts">
 definePageMeta({ middleware: 'guest' })
 
@@ -15,7 +16,7 @@ onMounted(async () => {
     })
     success.value = true
   } catch (err: any) {
-    error.value = 'لینک تأیید نامعتبر یا منقضی شده است.'
+    error.value = 'The verification link is invalid or has expired.'
   } finally {
     loading.value = false
   }
@@ -45,7 +46,7 @@ onMounted(async () => {
         <!-- Loading -->
         <div v-if="loading" class="state-box">
           <div class="spinner" />
-          <p class="state-text">در حال تأیید ایمیل...</p>
+          <p class="state-text">Verifying your email...</p>
         </div>
 
         <!-- Success -->
@@ -56,9 +57,9 @@ onMounted(async () => {
               <path d="M9 16l5 5 9-9" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 class="state-title">ایمیل تأیید شد!</h2>
-          <p class="state-desc">حساب شما با موفقیت فعال شد.</p>
-          <NuxtLink to="/login" class="submit-btn">ورود به حساب</NuxtLink>
+          <h2 class="state-title">Email Verified!</h2>
+          <p class="state-desc">Your account has been successfully activated.</p>
+          <NuxtLink to="/login" class="submit-btn">Sign In</NuxtLink>
         </div>
 
         <!-- Error -->
@@ -69,9 +70,9 @@ onMounted(async () => {
               <path d="M10 10l12 12M22 10L10 22" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </div>
-          <h2 class="state-title">لینک نامعتبر است</h2>
+          <h2 class="state-title">Invalid Link</h2>
           <p class="state-desc">{{ error }}</p>
-          <NuxtLink to="/login" class="submit-btn">برگشت به ورود</NuxtLink>
+          <NuxtLink to="/login" class="submit-btn">Back to Login</NuxtLink>
         </div>
 
       </div>

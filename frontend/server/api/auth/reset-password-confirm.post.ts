@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       data: err.data,
-      message: err.data?.token?.[0] || 'خطا در تغییر رمز عبور'
+      message: err.data?.token?.[0] || 'Faile to change password'
     })
   }
 })

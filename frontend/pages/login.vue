@@ -1,9 +1,7 @@
 <!-- pages/login.vue -->
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
-import {  ref } from 'vue'
-
-
+import { ref } from 'vue'
 
 const authStore = useAuthStore()
 
@@ -12,6 +10,7 @@ const password = ref('')
 const error = ref('')
 const loading = ref(false)
 const showPassword = ref(false)
+
 const handleLogin = async (e: Event) => {
   e.preventDefault()
   error.value = ''
@@ -23,20 +22,21 @@ const handleLogin = async (e: Event) => {
   } catch (err: any) {
     const message = err?.data?.message || err?.message || ''
 
-   if (err?.data?.statusCode === 403 || message === 'email_not_verified') {
-  await navigateTo({
-    path: '/email-not-verified',
-    query: { email: email.value.trim() } // ← ایمیل رو پاس بده
-  })
-  return
-}
+    if (err?.data?.statusCode === 403 || message === 'email_not_verified') {
+      await navigateTo({
+        path: '/email-not-verified',
+        query: { email: email.value.trim() } // ← pass email
+      })
+      return
+    }
 
-    error.value = message || 'ورود ناموفق بود.'
+    error.value = message || 'Login failed. Please try again.'
   } finally {
     loading.value = false
   }
 }
 </script>
+
 <template>
   <div class="login-page">
     <div class="bg-orb bg-orb-1" />
@@ -59,15 +59,15 @@ const handleLogin = async (e: Event) => {
       <!-- Card -->
       <div class="card">
         <div class="card-header">
-          <h1 class="card-title">خوش برگشتید</h1>
-          <p class="card-subtitle">وارد حساب کاربری خود شوید</p>
+          <h1 class="card-title">Welcome Back</h1>
+          <p class="card-subtitle">Sign in to your account</p>
         </div>
 
         <GoogleLoginButton />
 
         <div class="divider">
           <span class="divider-line" />
-          <span class="divider-text">یا با ایمیل</span>
+          <span class="divider-text">or continue with email</span>
           <span class="divider-line" />
         </div>
 
@@ -84,7 +84,7 @@ const handleLogin = async (e: Event) => {
 
           <!-- Email -->
           <div class="field">
-            <label class="field-label">ایمیل</label>
+            <label class="field-label">Email</label>
             <div class="field-input-wrap">
               <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2 4a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-.5a.5.5 0 00-.5.5v.379l4.5 3 4.5-3V4a.5.5 0 00-.5-.5H4zm8.5 2.121l-4.5 3-4.5-3V12a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5.621z" />
@@ -104,8 +104,8 @@ const handleLogin = async (e: Event) => {
           <!-- Password -->
           <div class="field">
             <div class="field-label-row">
-              <label class="field-label">رمز عبور</label>
-              <NuxtLink to="/forgot-password" class="forgot-link">فراموشی رمز؟</NuxtLink>
+              <label class="field-label">Password</label>
+              <NuxtLink to="/forgot-password" class="forgot-link">Forgot password?</NuxtLink>
             </div>
             <div class="field-input-wrap">
               <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -114,7 +114,7 @@ const handleLogin = async (e: Event) => {
               <input
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="رمز عبور خود را وارد کنید"
+                placeholder="Enter your password"
                 class="field-input"
                 autocomplete="current-password"
                 dir="ltr"
@@ -133,7 +133,7 @@ const handleLogin = async (e: Event) => {
 
           <!-- Submit -->
           <button type="submit" class="submit-btn" :disabled="loading">
-            <span v-if="!loading">ورود به حساب</span>
+            <span v-if="!loading">Sign In</span>
             <span v-else class="loading-dots">
               <span /><span /><span />
             </span>
@@ -141,8 +141,8 @@ const handleLogin = async (e: Event) => {
         </form>
 
         <div class="card-footer">
-          <span class="footer-text">حساب کاربری ندارید؟</span>
-          <NuxtLink to="/register" class="footer-link">ثبت‌نام کنید</NuxtLink>
+          <span class="footer-text">Don't have an account?</span>
+          <NuxtLink to="/register" class="footer-link">Sign Up</NuxtLink>
         </div>
       </div>
     </div>

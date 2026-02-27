@@ -4,24 +4,42 @@
   background: v.$bg-root;
   color: v.$text-primary;
   font-family: v.$font-main;
+  direction: ltr;
+  text-align: left;
+}
 
-  .auth-card {
-    background: v.$bg-card;
-    border: 1px solid v.$border-color;
-    border-radius: v.$radius-card;
+.auth-card {
+  background: v.$bg-card;
+  border: 1px solid v.$border-color;
+  border-radius: v.$radius-card;
+  /* اگر کارت نیاز به چپ‌چین داخلی دارد، می‌توانید اضافه کنید */
+  /* text-align: left; */
+}
+
+.auth-input {
+  background: v.$bg-field;
+  border-radius: v.$radius-input;
+  color: v.$text-primary;
+  direction: ltr;
+  text-align: left;
+  padding: 0.75rem 1rem;           /* padding استاندارد LTR */
+
+  &:focus {
+    border-color: v.$border-focus;
   }
 
-  .auth-input {
-    background: v.$bg-field;
-    border-radius: v.$radius-input;
-    color: v.$text-primary;
+  &::placeholder {
+    color: v.$text-placeholder;
+    text-align: left;
+  }
+}
 
-    &:focus {
-      border-color: v.$border-focus;
-    }
+.auth-input {
+  unicode-bidi: plaintext;
 
-    &::placeholder {
-      color: v.$text-placeholder;
-    }
+  &.rtl-input {
+    direction: rtl;
+    text-align: right;
+    padding: 0.75rem 1rem 0.75rem 1rem; 
   }
 }

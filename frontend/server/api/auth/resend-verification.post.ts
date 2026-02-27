@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     console.error('Resend error:', JSON.stringify(err.data, null, 2))
     throw createError({
       statusCode: err.status || 400,
-      message: err.data?.detail || err.data?.email?.[0] || 'خطا در ارسال ایمیل'
+      message: err.data?.detail || err.data?.email?.[0] || 'Failed to send Email'
     })
   }
 })

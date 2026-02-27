@@ -43,7 +43,7 @@ const submit = async () => {
       err?.data?.token?.[0] ||
       err?.data?.new_password2?.[0] ||
       err?.data?.message ||
-      'لینک منقضی شده یا نامعتبر است. لطفاً دوباره درخواست دهید.'
+      'The link has expired or is invalid. Please request a new one.'
   } finally {
     loading.value = false
   }
@@ -81,13 +81,13 @@ const submit = async () => {
                 <path d="M9 16l5 5 9-9" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <h2 class="success-title">رمز عبور تغییر کرد</h2>
-            <p class="success-desc">رمز عبور شما با موفقیت به‌روزرسانی شد.</p>
+            <h2 class="success-title">Password Changed</h2>
+            <p class="success-desc">Your password has been successfully updated.</p>
             <NuxtLink to="/login" class="back-btn">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M15 8a.5.5 0 01-.5.5H2.707l3.147 3.146a.5.5 0 01-.708.708l-4-4a.5.5 0 010-.708l4-4a.5.5 0 01.708.708L2.707 7.5H14.5A.5.5 0 0115 8z"/>
+                <path d="M1 8a.5.5 0 01.5-.5h12.293l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L2.707 8.5H1.5A.5.5 0 011 8z"/>
               </svg>
-              ورود به حساب
+              Sign In
             </NuxtLink>
           </div>
         </Transition>
@@ -102,8 +102,8 @@ const submit = async () => {
                   <path d="M10.854 5.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 11.708-.708L7.5 7.793l2.646-2.647a.5.5 0 01.708 0z"/>
                 </svg>
               </div>
-              <h1 class="card-title">تعیین رمز عبور جدید</h1>
-              <p class="card-subtitle">رمز عبور جدید خود را وارد کنید.</p>
+              <h1 class="card-title">Set New Password</h1>
+              <p class="card-subtitle">Enter your new password below.</p>
             </div>
 
             <form @submit.prevent="submit" class="form" novalidate>
@@ -120,7 +120,7 @@ const submit = async () => {
 
               <!-- Password 1 -->
               <div class="field">
-                <label class="field-label">رمز عبور جدید</label>
+                <label class="field-label">New Password</label>
                 <div class="field-input-wrap">
                   <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 1a4 4 0 00-4 4v1H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm0 1.5A2.5 2.5 0 0110.5 5v1h-5V5A2.5 2.5 0 018 2.5zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
@@ -128,7 +128,7 @@ const submit = async () => {
                   <input
                     v-model="password1"
                     :type="showPass1 ? 'text' : 'password'"
-                    placeholder="حداقل ۸ کاراکتر"
+                    placeholder="At least 8 characters"
                     class="field-input"
                     autocomplete="new-password"
                     dir="ltr"
@@ -159,7 +159,7 @@ const submit = async () => {
 
               <!-- Password 2 -->
               <div class="field">
-                <label class="field-label">تکرار رمز عبور جدید</label>
+                <label class="field-label">Confirm New Password</label>
                 <div class="field-input-wrap" :class="{ 'field-error': !passwordMatch && password2 }">
                   <svg class="field-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 1a4 4 0 00-4 4v1H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm0 1.5A2.5 2.5 0 0110.5 5v1h-5V5A2.5 2.5 0 018 2.5zm0 7a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
@@ -167,7 +167,7 @@ const submit = async () => {
                   <input
                     v-model="password2"
                     :type="showPass2 ? 'text' : 'password'"
-                    placeholder="رمز عبور را تکرار کنید"
+                    placeholder="Confirm your new password"
                     class="field-input"
                     autocomplete="new-password"
                     dir="ltr"
@@ -182,12 +182,12 @@ const submit = async () => {
                     </svg>
                   </button>
                 </div>
-                <p v-if="!passwordMatch && password2" class="field-hint-error">رمز عبور مطابقت ندارد</p>
+                <p v-if="!passwordMatch && password2" class="field-hint-error">Passwords do not match</p>
               </div>
 
               <!-- Submit -->
               <button type="submit" class="submit-btn" :disabled="!isValid || loading">
-                <span v-if="!loading">تغییر رمز عبور</span>
+                <span v-if="!loading">Change Password</span>
                 <span v-else class="loading-dots">
                   <span /><span /><span />
                 </span>
@@ -197,14 +197,13 @@ const submit = async () => {
             <div class="card-footer">
               <NuxtLink to="/login" class="footer-link">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M15 8a.5.5 0 01-.5.5H2.707l3.147 3.146a.5.5 0 01-.708.708l-4-4a.5.5 0 010-.708l4-4a.5.5 0 01.708.708L2.707 7.5H14.5A.5.5 0 0115 8z"/>
+                  <path d="M1 8a.5.5 0 01.5-.5h12.293l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L2.707 8.5H1.5A.5.5 0 011 8z"/>
                 </svg>
-                برگشت به ورود
+                Back to Login
               </NuxtLink>
             </div>
           </div>
         </Transition>
-
       </div>
     </div>
   </div>

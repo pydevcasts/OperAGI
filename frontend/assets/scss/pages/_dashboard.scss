@@ -10,13 +10,14 @@
 // ─── Root Layout ──────────────────────────────────────
 .dashboard-root {
   font-family: v.$font-main;
-  direction: rtl;
+  direction: ltr;
   display: flex;
   min-height: 100vh;
   background: #060912;
   color: v.$text-secondary;
   position: relative;
   overflow-x: hidden;
+  text-align: left;
 }
 
 // ─── Ambient Background ───────────────────────────────
@@ -33,7 +34,7 @@
   height: 600px;
   background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 65%);
   top: -200px;
-  right: -100px;
+  left: -100px;
   animation: drift 12s ease-in-out infinite;
 }
 
@@ -43,7 +44,7 @@
   height: 500px;
   background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 65%);
   bottom: -150px;
-  left: -50px;
+  right: -50px;
   animation: drift 15s ease-in-out infinite reverse;
 }
 
@@ -86,16 +87,16 @@
 .sidebar {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   width: 240px;
   height: 100vh;
   background: rgba(10, 14, 26, 0.95);
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   z-index: 50;
-  transform: translateX(100%);
+  transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (min-width: 1024px) {
@@ -251,7 +252,7 @@
 // ─── Main ─────────────────────────────────────────────
 .main {
   flex: 1;
-  margin-left: 0;
+  margin-right: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -259,7 +260,7 @@
   z-index: 1;
 
   @media (min-width: 1024px) {
-    margin-right: 240px;
+    margin-left: 240px;
   }
 }
 
@@ -308,7 +309,7 @@
 
 .search-icon {
   position: absolute;
-  right: 0.8rem;
+  left: 0.8rem;
   color: v.$text-placeholder;
   pointer-events: none;
 }
@@ -318,13 +319,14 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 10px;
-  padding: 0.55rem 2.2rem 0.55rem 1rem;
+  padding: 0.55rem 1rem 0.55rem 2.2rem;
   color: v.$text-muted;
   font-family: v.$font-main;
   font-size: 0.85rem;
   outline: none;
   transition: border-color 0.2s;
-  direction: rtl;
+  direction: ltr;
+  text-align: left;
 
   &::placeholder { color: v.$text-placeholder; }
   &:focus { border-color: rgba(99, 102, 241, 0.4); }
@@ -334,7 +336,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-right: auto;
+  margin-left: auto;
 }
 
 .topbar-btn {
@@ -355,7 +357,7 @@
 .notif-dot {
   position: absolute;
   top: 6px;
-  left: 6px;
+  right: 6px;
   width: 7px;
   height: 7px;
   background: v.$color-primary;
@@ -627,7 +629,7 @@
   gap: 1rem;
 
   @media (min-width: 768px) {
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 320px 1fr;
   }
 }
 
@@ -712,7 +714,7 @@
 .upgrade-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at top right, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
   pointer-events: none;
 }
 

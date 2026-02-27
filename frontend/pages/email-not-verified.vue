@@ -1,4 +1,7 @@
+<!-- pages/email-not-verified.vue -->
 <script setup lang="ts">
+import {ref, computed} from 'vue'
+
 const { user } = useUserSession()
 const route = useRoute()
 const loading = ref(false)
@@ -11,7 +14,7 @@ const userEmail = computed(() =>
 
 const resend = async () => {
   if (!userEmail.value) {
-    error.value = 'ایمیل یافت نشد. لطفاً دوباره ثبت‌نام کنید.'
+    error.value = 'Email not found. Please register again.'
     return
   }
   
@@ -24,7 +27,7 @@ const resend = async () => {
     })
     sent.value = true
   } catch (err: any) {
-    error.value = err?.data?.message || 'خطا در ارسال ایمیل.'
+    error.value = err?.data?.message || 'Error sending verification email.'
   } finally {
     loading.value = false
   }
@@ -52,21 +55,20 @@ const resend = async () => {
       <div class="card">
         <div v-if="!sent" class="state-box">
           <div class="mail-icon">📧</div>
-          <h2 class="state-title">ایمیل خود را تأیید کنید</h2>
+          <h2 class="state-title">Verify Your Email</h2>
           <p class="state-desc">
-            برای استفاده از خدمات، ابتدا باید ایمیل
-            <strong style="color:#818cf8">{{ (user as any)?.email }}</strong>
-            را تأیید کنید.
+            To use our services, please first verify your email address
+            <strong style="color:#818cf8">{{ userEmail }}</strong>.
           </p>
 
           <div v-if="error" class="error-banner">{{ error }}</div>
 
           <button class="submit-btn" :disabled="loading" @click="resend">
-            <span v-if="!loading">ارسال مجدد ایمیل تأیید</span>
+            <span v-if="!loading">Resend Verification Email</span>
             <span v-else class="loading-dots"><span /><span /><span /></span>
           </button>
 
-          <NuxtLink to="/" class="footer-link">برگشت به خانه</NuxtLink>
+          <NuxtLink to="/" class="footer-link">Back to Home</NuxtLink>
         </div>
 
         <div v-else class="state-box">
@@ -76,9 +78,9 @@ const resend = async () => {
               <path d="M9 16l5 5 9-9" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 class="state-title">ایمیل ارسال شد</h2>
-          <p class="state-desc">پوشه inbox و spam خود را بررسی کنید.</p>
-          <NuxtLink to="/" class="footer-link">برگشت به خانه</NuxtLink>
+          <h2 class="state-title">Email Sent</h2>
+          <p class="state-desc">Please check your inbox and spam folder.</p>
+          <NuxtLink to="/" class="footer-link">Back to Home</NuxtLink>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     console.error('Verify email error:', err.data)
     throw createError({
       statusCode: 400,
-      message: 'لینک تأیید نامعتبر یا منقضی شده است.'
+      message: 'The verification link is invalid or has expired.'
     })
   }
 })
