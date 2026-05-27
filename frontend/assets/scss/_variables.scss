@@ -5,6 +5,9 @@ $bg-root:            #080b14;
 $bg-card:            rgba(15, 20, 35, 0.85);
 $bg-field:           rgba(255, 255, 255, 0.04);
 $bg-google-btn:      rgba(255, 255, 255, 0.05);
+$bg-twitter-btn:     rgba(255, 255, 255, 0.05);
+$bg-youtube-btn:     rgba(255, 255, 255, 0.05);
+$bg-instagram-btn:   rgba(255, 255, 255, 0.05);
 
 $color-primary:      #6366f1;
 $color-primary-light:#8b5cf6;
@@ -23,6 +26,9 @@ $text-placeholder:   #334155;
 $border-color:       rgba(255, 255, 255, 0.07);
 $border-light:       rgba(255, 255, 255, 0.08);
 $border-google:      rgba(255, 255, 255, 0.1);
+$border-twitter:     rgba(255, 255, 255, 0.1);
+$border-instagram:   rgba(255, 255, 255, 0.1);
+$border-youtube:     rgba(255, 255, 255, 0.1);
 $border-focus:       rgba(99, 102, 241, 0.6);
 
 $error-bg:           rgba(239, 68, 68, 0.1);
@@ -31,12 +37,14 @@ $error-text:         #fca5a5;
 
 $success-color:      #34d399;
 
-// ─── Typography ───────────────────────────────────────
-// Vazirmatn is Persian font; for pure English/LTR interface, consider fallback or replacement
-$font-main:          'Vazirmatn', 'Inter', 'Segoe UI', system-ui, sans-serif;
-
 // ─── Border Radius ────────────────────────────────────
 $radius-card:        20px;
 $radius-input:       10px;
 $radius-btn:         10px;
 $radius-brand-icon:  12px;
+
+// Social button colors
+
+
+// ▒▒▒▒▒▒▒▒▒ Font ▒▒▒▒▒▒▒▒▒
+$font-main: 'Inter', 'Vazirmatn', system-ui, sans-serif;

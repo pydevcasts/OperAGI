@@ -7,7 +7,6 @@ const googleLogin = () => {
   window.location.href = '/auth/google'
 }
 
-// Unmount log
 onUnmounted(() => {
   console.log('Google button component unmounted')
 })
@@ -25,6 +24,6 @@ onUnmounted(() => {
       <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
       <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/>
     </svg>
-    Sign in with Google
+  
   </button>
 </template>

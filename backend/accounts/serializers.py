@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from allauth.account.adapter import get_adapter
 
+from django.contrib.auth import get_user_model
 User = get_user_model()
 
 

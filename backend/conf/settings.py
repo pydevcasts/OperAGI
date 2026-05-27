@@ -31,24 +31,35 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'api',
+
     'corsheaders',
-    'documents',
-    'qa',
-    # ---
-    'accounts',
+    # ── REST / Auth Setup ──
     'rest_framework',
-    'rest_framework_simplejwt',  # فقط این
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'django.contrib.sites',
+
+    # ── Allauth Core ──
     'allauth',
     'allauth.account',
-    'drf_yasg',
-    'rest_framework.authtoken',
-    # ---
     'allauth.socialaccount',
+
+    # ── Providers ──
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.instagram',
+    'allauth.socialaccount.providers.twitter',
+
+    # ── Swagger & Docs ──
+    'drf_yasg',
+
+    # ── Your App(s) ──
+    'api',
+    'accounts',
+    'content_generator',
+    'social_accounts',
 ]
 SITE_ID = 4
 
@@ -85,8 +96,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'conf.wsgi.application'
 
-# Database
+# config databases
 if os.environ.get('DOCKER_ENV'):
+    # اگر در Docker باشیم، از PostgreSQL استفاده کن
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -95,6 +107,18 @@ if os.environ.get('DOCKER_ENV'):
             'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
+        }
+    }
+elif os.environ.get('USE_MYSQL') == '1':
+    # اگر XAMPP فعال باشد، از MySQL استفاده کن
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME_MYSQL', 'your_database_name'),  # نام پایگاه داده MySQL
+            'USER': os.getenv('DB_USER_MYSQL', 'root'),  # کاربر MySQL (معمولاً root)
+            'PASSWORD': os.getenv('DB_PASSWORD_MYSQL', ''),  # رمز عبور MySQL (معمولاً خالی)
+            'HOST': os.getenv('DB_HOST_MYSQL', 'localhost'),  # آدرس پایگاه داده
+            'PORT': os.getenv('DB_PORT_MYSQL', '3306'),  # پورت MySQL (معمولاً 3306)
         }
     }
 else:
@@ -133,15 +157,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # dj_rest_auth + JWT
 REST_AUTH = {
-    'USE_JWT': True,  # فعال
+    'USE_JWT': True,  
     'JWT_AUTH_COOKIE': 'jwt-access',
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh',
     'JWT_AUTH_HTTPONLY': False,  # برای فرانت‌اند
     'PASSWORD_RESET_USE_SITES_DOMAIN': False,
     'OLD_PASSWORD_FIELD_ENABLED': True,
     'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializer',
-
-    
 }
 
 # REST Framework + SimpleJWT
@@ -185,8 +207,6 @@ EMAIL_HOST_PASSWORD = 'xjbu hmch wezu tiuj'  # App Password
 DEFAULT_FROM_EMAIL = 'Operagi <pydevcasts@gmail.com>'
 
 # Google OAuth
-GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
-GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
 GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL')
 
 
@@ -227,37 +247,54 @@ CSRF_TRUSTED_ORIGINS = [
 # Allauth + dj-rest-auth اضافی
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
-# development
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}'
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # ← ایمیل باید تأیید بشه
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+# ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
-# Google SCOPE کامل‌تر
+# Google SCOPE
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': GOOGLE_OAUTH_CLIENT_ID,
-            'secret': GOOGLE_OAUTH_CLIENT_SECRET,
+            'client_id': os.getenv('GOOGLE_OAUTH_CLIENT_ID'),
+            'secret': os.getenv('GOOGLE_OAUTH_CLIENT_SECRET'),
             'key': ''
         },
         'SCOPE': [
-            'openid',     # ← اضافه شد
+            'openid',     
             'profile',
             'email',
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
-    }
+    },
+    'instagram': {
+        'APP': {
+            'client_id': os.getenv('INSTAGRAM_CLIENT_ID'),
+            'secret': os.getenv('INSTAGRAM_CLIENT_SECRET'),
+            'key': ''
+        },
+        'SCOPE': ['user_profile', 'user_media'],
+        'AUTH_PARAMS': {'scope': 'user_profile,user_media'},
+    },
+    'twitter': {
+        'APP': {
+            'client_id': os.getenv('TWITTER_CONSUMER_KEY'),
+            'secret': os.getenv('TWITTER_CONSUMER_SECRET'),
+            'key': ''
+        },
+    },
 }

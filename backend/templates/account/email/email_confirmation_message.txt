@@ -1,8 +1,11 @@
 
-سلام {{ user.email }}،
+Hello {{ user.email }},
 
-برای تأیید ایمیل روی لینک زیر کلیک کنید:
+To verify your email, please click the link below:
 
 {{ activate_url }}
 
-اگر این حساب را نساختید، این ایمیل را نادیده بگیرید.
+If you did not create this account, please disregard this email.
+
+
+

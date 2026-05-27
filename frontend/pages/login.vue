@@ -63,8 +63,14 @@ const handleLogin = async (e: Event) => {
           <p class="card-subtitle">Sign in to your account</p>
         </div>
 
-        <GoogleLoginButton />
-
+     <div class="horizontal-social-container">
+        <div class="social-login-buttons">
+          <GoogleLoginButton class="social-btn" />
+          <TwitterLoginButton class="social-btn" />
+          <InstagramLoginButton class="social-btn" />
+          <YouTubeLoginButton class="social-btn" />
+        </div>
+      </div>
         <div class="divider">
           <span class="divider-line" />
           <span class="divider-text">or continue with email</span>
@@ -148,3 +154,4 @@ const handleLogin = async (e: Event) => {
     </div>
   </div>
 </template>
+

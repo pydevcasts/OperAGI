@@ -1,24 +1,70 @@
 @use 'variables' as v;
 
-.google-btn {
+// کلاس پایه برای دکمه‌های ورود شبکه‌های اجتماعی
+.social-btn {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
   padding: 0.75rem;
-  background: v.$bg-google-btn;
-  border: 1px solid v.$border-google;
+  background: v.$bg-google-btn; // از متغیر گوگل استفاده می‌کنیم چون همه یکسان هستند
+  border: 1px solid v.$border-google; // از متغیر گوگل استفاده می‌کنیم چون همه یکسان هستند
   border-radius: v.$radius-btn;
   color: v.$text-secondary;
   font-family: v.$font-main;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-
+  border-color: v.$border-google; // اطمینان از اعمال رنگ حاشیه
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+  
   &:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+    // اگر خواستید hover برای همه دکمه‌ها کمی متفاوت باشد، اینجا می‌توانید اضافه کنید
+    // مثال: background: lighten(v.$bg-google-btn, 5%);
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// ------- کانتینرها و طرح‌بندی --------
+
+.horizontal-social-container {
+  padding: 0 1rem;
+}
+
+.social-login-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between; // یا space-around بسته به نیاز
+}
+
+// این بخش تعیین می‌کند که هر دکمه چقدر فضا بگیرد
+// اگر می‌خواهید 4 دکمه در یک ردیف باشند (در صفحه بزرگ)
+.social-btn {
+  flex: 1 1 calc(25% - 0.75rem); // 25% عرض با در نظر گرفتن گپ
+  min-width: 150px; // حداقل عرض برای جلوگیری از کوچک شدن بیش از حد
+}
+
+/* واکنش‌گرا برای صفحه‌های کوچک */
+@media (max-width: 768px) {
+  .social-login-buttons {
+    gap: 0.5rem;
+  }
+  .social-btn {
+    flex: 1 1 calc(50% - 0.25rem); // 50% عرض برای دو دکمه در ردیف
+    min-width: unset; // حذف حداقل عرض برای اینکه به راحتی جا شوند
+  }
+}
+
+@media (max-width: 480px) {
+  .social-btn {
+    flex: 1 1 100%; // یک دکمه در هر ردیف در صفحات خیلی کوچک
   }
 }

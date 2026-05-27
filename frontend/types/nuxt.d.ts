@@ -16,7 +16,8 @@ declare global {
   const setUserSession: typeof import('#auth-utils')['setUserSession']
   const navigateTo: typeof import('#app')['navigateTo']
   const $fetch: typeof import('ofetch')['$fetch']
-
+  const useRuntimeConfig: typeof import('#app')['useRuntimeConfig'] 
+  
   export function useUserSession(): {
     loggedIn: ComputedRef<boolean>
     user: ComputedRef<any>

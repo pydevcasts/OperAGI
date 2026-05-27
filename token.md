@@ -120,3 +120,85 @@ Prerender روی صفحه auth-protected
 #Nuxt3 #VueJS #WebDevelopment #Frontend #Authentication #JavaScript #برنامه‌نویسی #NuxtAuthUtils
 
 
+
+
+
+{
+  
+  "email": "pydevcasts@gmail.com",
+  "password": "Poing1981@"
+}
+
+113203790538738743817
+
+https://lh3.googleusercontent.com/a/ACg8ocKqtvFIKQ57GT9UgchechNn9VfxNFbfxr-l5uoyL9TNktgL-bY=s96-c
+
+https://lh3.googleusercontent.com/a/ACg8ocKqtvFIKQ57GT9UgchechNn9VfxNFbfxr-l5uoyL9TNktgL-bY=s96-c
+
+
+
+
+
+برای **تست‌نویسی در پروژه Nuxt + TypeScript + Vue** بهترین و استانداردترین انتخاب امروز **Vitest** است.  
+چرا؟ چون:  
+- توسط تیم Vite/ Vue پشتیبانی می‌شود  
+- با Nuxt کاملاً سازگار است  
+- سرعت بسیار بالایی دارد  
+- تنظیمات آماده در Nuxt دارد  
+- با TypeScript بدون پیکربندی اضافی کار می‌کند  
+
+---
+
+## ✅ بسته‌هایی که باید نصب کنی
+در یک پروژه Nuxt 3:
+
+نصب اصلی Vitest + ابزارهای مخصوص Vue و Nuxt:
+
+```bash
+npm install -D vitest @vue/test-utils vue-tsc happy-dom
+```
+
+اگر از Nuxt استفاده می‌کنی، افزونه رسمی Nuxt Test را هم نصب کن:
+
+```bash
+npm install -D @nuxt/test-utils
+```
+
+---
+
+## 📌 توضیح سریع این بسته‌ها
+- **vitest** → موتور تست (مشابه Jest ولی سریع‌تر و مخصوص Vite/Nuxt)
+- **@vue/test-utils** → ابزارهای رسمی برای تست کامپوننت‌های Vue
+- **happy-dom** → شبیه‌ساز DOM سبک و سریع (به‌جای jsdom)
+- **vue-tsc** → چک کردن TypeScript در Vue SFC
+- **@nuxt/test-utils** → ابزار رسمی مخصوص Nuxt برای تست روت‌ها، پلاگین‌ها، کامپوننت‌ها و composableها
+
+---
+
+## 📁 پیکربندی ساده vitest.config.ts برای Vue/Nuxt
+
+فایل `vitest.config.ts`:
+
+```ts
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+  test: {
+    environment: 'happy-dom',
+    globals: true
+  }
+})
+```
+
+---
+
+## ⭐ بهترین انتخاب؟
+اگر Nuxt 3 + TypeScript + Vue دارید، **قطعاً Vitest** بهترین و سریع‌ترین گزینه‌ست.  
+اگر خواستی می‌تونم:
+- نمونه تست کامپوننت  
+- نمونه تست composable  
+- پیکربندی کامل Nuxt Test Utils  
+- یا حتی تست E2E با Playwright  
+برات بسازم.
