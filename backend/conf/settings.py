@@ -15,12 +15,17 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY', 'local-development-only-change-me')
+DEBUG = os.getenv('DEBUG', 'False').lower() in {'1', 'true', 'yes'}
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 # OpenAI
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+CONTENT_GENERATION_PROVIDER = os.getenv('CONTENT_GENERATION_PROVIDER', 'local').lower()
+CONTENT_GENERATION_MODEL = os.getenv('CONTENT_GENERATION_MODEL', 'gpt-4o-mini')
+CONTENT_GENERATION_BASE_URL = os.getenv('CONTENT_GENERATION_BASE_URL', 'https://api.openai.com/v1')
+CONTENT_GENERATION_TIMEOUT = int(os.getenv('CONTENT_GENERATION_TIMEOUT', '20'))
+SOCIAL_PUBLISH_MODE = os.getenv('SOCIAL_PUBLISH_MODE', 'simulate').lower()
 
 # Application definition
 INSTALLED_APPS = [
@@ -169,7 +174,8 @@ REST_AUTH = {
 # REST Framework + SimpleJWT
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',  # مهم!
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',  # existing cookie authentication
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -202,9 +208,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'pydevcasts@gmail.com'
-EMAIL_HOST_PASSWORD = 'xjbu hmch wezu tiuj'  # App Password
-DEFAULT_FROM_EMAIL = 'Operagi <pydevcasts@gmail.com>'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'OperAGI <noreply@localhost>')
 
 # Google OAuth
 GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL')
@@ -252,7 +258,7 @@ PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}'
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # ← ایمیل باید تأیید بشه
+ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 # ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 # ACCOUNT_USERNAME_REQUIRED = False
@@ -296,5 +302,20 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.getenv('TWITTER_CONSUMER_SECRET'),
             'key': ''
         },
+    },
+}
+
+
+# Celery is optional locally. API code safely falls back when no broker is
+# reachable; Docker Compose enables worker and beat processes.
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER', 'True').lower() in {'1', 'true', 'yes'}
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE = {
+    'publish-due-operagi-posts': {
+        'task': 'content_generator.tasks.process_due_schedules',
+        'schedule': 60.0,
     },
 }

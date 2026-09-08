@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from accounts.models import User
+from accounts.models import Payment, SubscriptionPlan, User, UserSubscription
 
-# Register your models here.
 admin.site.register(User)
+admin.site.register(SubscriptionPlan)
+admin.site.register(UserSubscription)
+admin.site.register(Payment)

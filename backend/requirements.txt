@@ -28,3 +28,9 @@ sqlparse==0.5.5
 tzdata==2025.3
 uritemplate==4.2.0
 urllib3==2.6.3
+celery==5.5.3
+redis==6.4.0
+psycopg[binary]==3.2.10
+gunicorn==23.0.0
+oauthlib==3.3.1
+requests-oauthlib==2.0.0

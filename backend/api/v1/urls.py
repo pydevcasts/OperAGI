@@ -2,9 +2,11 @@
 
 from django.urls import path, include
 from dj_rest_auth.views import PasswordResetConfirmView
-from accounts.views import GoogleLogin, InstagramLogin, TwitterLogin
+from accounts.views import CurrentSubscriptionView, GoogleLogin, InstagramLogin, SubscriptionPlanList, TwitterLogin
 
 urlpatterns = [
+    path('plans/', SubscriptionPlanList.as_view(), name='subscription-plans'),
+    path('subscription/', CurrentSubscriptionView.as_view(), name='current-subscription'),
     path('content_generator/', include('content_generator.urls')),
     path('social/', include('social_accounts.urls')), 
     path('rest-auth/', include('dj_rest_auth.urls')),

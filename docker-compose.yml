@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: operagi
+      POSTGRES_USER: operagi
+      POSTGRES_PASSWORD: operagi
+    volumes: [operagi-postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U operagi]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: [operagi-redis:/data]
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DOCKER_ENV: '1'
+      DB_HOST: db
+      CELERY_TASK_ALWAYS_EAGER: '0'
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    command: sh -c 'python manage.py migrate && gunicorn conf.wsgi:application --bind 0.0.0.0:8000'
+    volumes: [./backend:/app]
+    ports: ['8000:8000']
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_started}
+  worker:
+    build: ./backend
+    env_file: .env
+    environment:
+      DOCKER_ENV: '1'
+      DB_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    command: celery -A conf worker -l info
+    volumes: [./backend:/app]
+    depends_on: [backend, redis]
+  beat:
+    build: ./backend
+    env_file: .env
+    environment:
+      DOCKER_ENV: '1'
+      DB_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    command: celery -A conf beat -l info
+    volumes: [./backend:/app]
+    depends_on: [backend, redis]
+volumes:
+  operagi-postgres:
+  operagi-redis:

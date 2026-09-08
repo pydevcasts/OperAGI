@@ -72,12 +72,45 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class SubscriptionPlan(models.Model):
+    slug = models.SlugField(unique=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    duration_days = models.PositiveIntegerField(default=30)  # طول اشتراک بر حسب روز
+    duration_days = models.PositiveIntegerField(default=30)
+    monthly_post_limit = models.PositiveIntegerField(null=True, blank=True)
+    social_account_limit = models.PositiveIntegerField(default=2)
+    features = models.JSONField(default=list, blank=True)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ('sort_order', 'price')
 
     def __str__(self):
         return self.name
+
+
+class UserSubscription(models.Model):
+    class Status(models.TextChoices):
+        TRIAL = 'trial', 'Trial'
+        ACTIVE = 'active', 'Active'
+        PAST_DUE = 'past_due', 'Past due'
+        CANCELLED = 'cancelled', 'Cancelled'
+        EXPIRED = 'expired', 'Expired'
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription')
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT, related_name='subscriptions')
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.TRIAL)
+    current_period_start = models.DateTimeField(default=timezone.now)
+    current_period_end = models.DateTimeField(null=True, blank=True)
+    external_customer_id = models.CharField(max_length=255, blank=True, default='')
+    external_subscription_id = models.CharField(max_length=255, blank=True, default='')
+    cancel_at_period_end = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.user.email} — {self.plan.name}'
+
 
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -87,6 +120,13 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=100, unique=True)
 
     def activate_subscription(self):
-        self.user.is_subscribed = True
-        self.user.subscription_expiry = timezone.now() + timedelta(days=self.plan.duration_days)
-        self.user.save()
+        now = timezone.now()
+        UserSubscription.objects.update_or_create(
+            user=self.user,
+            defaults={
+                'plan': self.plan,
+                'status': UserSubscription.Status.ACTIVE,
+                'current_period_start': now,
+                'current_period_end': now + timedelta(days=self.plan.duration_days),
+            },
+        )
