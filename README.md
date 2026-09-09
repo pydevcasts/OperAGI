@@ -283,3 +283,16 @@ MIT © 2025 pydevcasts
 🔗 GitHub: [https://github.com/pydevcasts/Operagi](https://github.com/pydevcasts/Operagi)  
 📧 Contact: pydevcasts@gmail.com
 
+## Phase 1 MVP (branch `6`)
+
+Branch `6` contains the Phase 1 influencer assistant built with the existing Django + Django REST Framework backend and Nuxt 4/Vue 3 frontend. It includes platform-aware content generation for Instagram, Twitter/X, and YouTube; bilingual English/Persian local generation with an optional OpenAI-compatible provider; social connection management; content posts and editing; scheduling and simulated publishing; analytics snapshots; subscription plans; Celery/Redis integration; and dashboard, calendar, connections, analytics, pricing, onboarding, and creation views.
+
+### Local setup
+
+Copy `.env.example` to `.env`, install backend dependencies from `backend/requirements.txt`, run `python manage.py migrate` from `backend/`, and start the API with `python manage.py runserver`. In a second terminal, run `npm ci` and `npm run dev` from `frontend/`. Local generation and simulated publishing work without external API keys. Set `CONTENT_GENERATION_PROVIDER=openai-compatible` and provide `OPENAI_API_KEY` only when an external compatible provider is desired. Set `ACCOUNT_EMAIL_VERIFICATION=mandatory` in environments where email verification must be enforced.
+
+For PostgreSQL, Redis, Celery worker, and Celery Beat, use `docker compose --env-file .env up --build`. The default non-Docker development configuration uses SQLite and eager Celery execution so the MVP remains runnable without Redis.
+
+### Validation
+
+The backend is validated with `python manage.py check` and `python manage.py test --noinput`. The frontend production bundle is validated with `npm run build`. Do not commit `.env` files or provider credentials; use `.env.example` as the configuration template.
