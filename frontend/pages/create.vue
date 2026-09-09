@@ -43,6 +43,18 @@ async function schedule() {
   await request('content_generator/schedules/', { method: 'POST', body: { post_id: result.value.id, scheduled_for: when, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone } })
   message.value = 'Added to your publishing calendar.'
 }
+async function publishNow() {
+  if (!result.value) return
+  saving.value = true
+  message.value = ''
+  try {
+    const published = await request<ContentPost>(`content_generator/posts/${result.value.id}/publish/`, { method: 'POST' })
+    result.value = published
+    message.value = 'Published successfully.'
+  } catch (error: any) {
+    message.value = error?.data?.statusMessage || error?.data?.detail || 'Publishing failed. Connect an account first.'
+  } finally { saving.value = false }
+}
 </script>
 
 <template><div class="create-page">
@@ -67,7 +79,7 @@ async function schedule() {
         <label v-if="form.platform === 'youtube'">Title<input v-model="result.generated_content.title" /></label>
         <label>{{ form.platform === 'youtube' ? 'Description' : 'Caption' }}<textarea v-model="editorText" rows="10" /></label>
         <label>Hashtags<input v-model="result.generated_content.suggested_hashtags" /></label>
-        <div class="actions"><button class="button secondary" :disabled="saving" @click="saveEdits">Save edits</button><button class="button primary" @click="schedule">Schedule</button></div>
+        <div class="actions"><button class="button secondary" :disabled="saving" @click="saveEdits">Save edits</button><button class="button secondary" :disabled="saving" @click="schedule">Schedule</button><button class="button primary" :disabled="saving" @click="publishNow">Publish now</button></div>
       </div>
     </section>
   </div>
