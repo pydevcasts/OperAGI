@@ -8,8 +8,8 @@ const mobileOpen = ref(false)
     <div class="phase-main">
       <header class="phase-topbar">
         <button class="icon-button mobile-menu" aria-label="Open navigation" @click="mobileOpen = true">☰</button>
-        <div><strong>OperAGI</strong><span class="muted topbar-sub"> Creator workspace</span></div>
-        <NuxtLink class="button primary compact" to="/create">+ Create content</NuxtLink>
+        <div class="topbar-context"><span class="topbar-kicker">WORKSPACE</span><strong>Creator workspace</strong></div>
+        <div class="topbar-actions"><span class="topbar-help">Need inspiration? <NuxtLink to="/create">Start with an idea</NuxtLink></span><NuxtLink class="button primary compact" to="/create">+ Create content</NuxtLink></div>
       </header>
       <main class="phase-content"><slot /></main>
     </div>

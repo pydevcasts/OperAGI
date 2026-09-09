@@ -45,21 +45,24 @@ async function schedule() {
 }
 </script>
 
-<template><div>
-  <PageHeader eyebrow="AI studio" title="Create platform-ready content" description="Local generation works out of the box in English and Persian. Add an API provider later without changing your workflow." />
+<template><div class="create-page">
+  <PageHeader eyebrow="AI studio / New draft" title="Create platform-ready content" description="Turn one idea into a polished post for every channel. Local generation works in English and Persian, with no API setup required." />
+  <div class="studio-meta"><span class="status-dot" /> Local generation is ready <span class="meta-divider">·</span> Draft mode</div>
   <div class="editor-grid">
     <form class="panel form-panel" @submit.prevent="generate">
+      <div class="section-kicker"><span>01</span><div><strong>Choose a channel</strong><small>Where do you want to publish?</small></div></div>
       <div class="segmented"><button v-for="platform in (['instagram','twitter','youtube'] as Platform[])" :key="platform" type="button" :class="{ active: form.platform === platform }" @click="form.platform = platform"><PlatformBadge :platform="platform" /></button></div>
+      <div class="section-kicker"><span>02</span><div><strong>Shape your idea</strong><small>Give the assistant a clear starting point.</small></div></div>
       <label>Content idea<textarea v-model="form.content" rows="6" required placeholder="Describe the topic, offer, or story you want to share…" /></label>
       <div class="form-row"><label>Language<select v-model="form.language"><option value="en">English</option><option value="fa">فارسی</option></select></label><label>Tone<select v-model="form.tone"><option>professional</option><option>friendly</option><option>bold</option><option>educational</option></select></label></div>
       <label>Visual direction <input v-model="form.visual_idea" placeholder="Optional shot, thumbnail, or visual concept" /></label>
       <label>Publish from<select v-model="form.social_account_id"><option :value="undefined">No account (draft only)</option><option v-for="account in matchingConnections" :key="account.id" :value="account.id">{{ account.display_name || account.social_account.uid }}</option></select></label>
-      <button class="button primary full" :disabled="loading || !form.content.trim()">{{ loading ? 'Creating draft…' : 'Generate content' }}</button>
+      <button class="button primary full generate-button" :disabled="loading || !form.content.trim()"><span>{{ loading ? 'Creating draft…' : 'Generate content' }}</span><span class="button-arrow">→</span></button>
       <p v-if="message" class="notice">{{ message }}</p>
     </form>
     <section class="panel preview-panel" :dir="form.language === 'fa' ? 'rtl' : 'ltr'">
-      <div class="panel-heading"><div><h2>Live preview</h2><p>{{ result ? `Generated with ${result.generated_content?.provider}` : 'Your result will appear here.' }}</p></div><PlatformBadge :platform="form.platform" /></div>
-      <div v-if="!result" class="phone-preview empty-state"><strong>Ready when you are</strong><span>Choose a platform, add your idea, and generate.</span></div>
+      <div class="panel-heading"><div><span class="preview-label">OUTPUT PREVIEW</span><h2>{{ result ? 'Your draft is ready' : 'Live preview' }}</h2><p>{{ result ? `Generated with ${result.generated_content?.provider}` : 'Your result will appear here.' }}</p></div><PlatformBadge :platform="form.platform" /></div>
+      <div v-if="!result" class="phone-preview empty-state"><div class="preview-icon">✦</div><strong>Ready when you are</strong><span>Choose a platform, add your idea, and generate.</span><div class="preview-lines"><i /><i /><i /></div></div>
       <div v-else class="generated-editor">
         <label v-if="form.platform === 'youtube'">Title<input v-model="result.generated_content.title" /></label>
         <label>{{ form.platform === 'youtube' ? 'Description' : 'Caption' }}<textarea v-model="editorText" rows="10" /></label>
